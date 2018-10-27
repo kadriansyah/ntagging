@@ -10,10 +10,11 @@ import '@polymer/paper-fab/paper-fab.js';
 import '@vaadin/vaadin-grid/vaadin-grid.js';
 import '@vaadin/vaadin-grid/vaadin-grid-column.js';
 
-import '../../moslemcorner/moslemcorner-shared-styles.js';
-import '../user-form/user-form.js';
+import './moslemcorner/markazuna-circular-pager.js';
+import './moslemcorner/moslemcorner-shared-styles.js';
+import './<%= singular_name %>-form.js';
 
-class UserList extends PolymerElement {
+class <%= singular_name.capitalize %>List extends PolymerElement {
     static get template() {
         return html`
             <style include="shared-styles">
@@ -22,6 +23,7 @@ class UserList extends PolymerElement {
                 }
                 vaadin-grid {
                     --card-margin: 5px 24px 24px 24px;
+                    height: 800px;
                 }
                 iron-icon {
                     padding-left: 10px;
@@ -46,6 +48,16 @@ class UserList extends PolymerElement {
                 .grid-header {
                     text-align: center;
                 }
+                markazuna-circular-pager {
+                    padding: 10px 10px 10px 10px;
+                }
+                .flex {
+                    display: flex;
+                    justify-content: center;
+                }
+                .grid-container {
+                    margin: 5px 5px 5px 5px;
+                }
             </style>
 
             <iron-ajax
@@ -63,38 +75,43 @@ class UserList extends PolymerElement {
                 on-error='_onDeleteError'>
             </iron-ajax>
 
-            <paper-progress id="progress" hidden indeterminate></paper-progress>
-            <vaadin-grid theme="row-stripes" aria-label="Users" items="[[data]]">
-                <vaadin-grid-column width="20%" flex-grow="0">
-                    <template class="header">Email</template>
-                    <template>[[item.email]]</template>
-                </vaadin-grid-column>
-                <vaadin-grid-column width="20%" flex-grow="0">
-                    <template class="header">Username</template>
-                    <template>[[item.username]]</template>
-                </vaadin-grid-column>
-                <vaadin-grid-column width="20%" flex-grow="0">
-                    <template class="header">First Name</template>
-                    <template>[[item.firstname]]</template>
-                </vaadin-grid-column>
-                <vaadin-grid-column width="20%" flex-grow="0">
-                    <template class="header">Last Name</template>
-                    <template>[[item.lastname]]</template>
-                </vaadin-grid-column>
-                <vaadin-grid-column width="20%" flex-grow="0">
-                    <template class="header"><div class="grid-header">Actions</div></template>
-                    <template>
-                        <div class="grid-header">
-                            <iron-icon icon="icons:create" on-tap="_edit" id="[[item.id]]"></iron-icon>
-                            <iron-icon icon="icons:delete" on-tap="_confirmation" id="[[item.id]]"></iron-icon>
-                            <iron-icon icon="icons:content-copy" on-tap="_copy" id="[[item.id]]"></iron-icon>
-                        </div>
-                    </template>
-                </vaadin-grid-column>
-            </vaadin-grid>
+            <div class="flex grid-container" width="100%">
+                <paper-progress id="progress" hidden indeterminate></paper-progress>
+                <vaadin-grid theme="row-stripes" aria-label="Users" items="[[data]]">
+                    <%
+                    @fields.each_with_index do |field, index|
+                        if index > 0
+                    %>
+                    <vaadin-grid-column width="20%" flex-grow="0">
+                        <template class="header"><%= field.capitalize %></template>
+                        <template>[[item.<%= field %>]]</template>
+                    </vaadin-grid-column>
+                    <%
+                        end
+                    end
+                    %>
+                    <vaadin-grid-column width="20%" flex-grow="0">
+                        <template class="header"><div class="grid-header">Actions</div></template>
+                        <template>
+                            <div class="grid-header">
+                                <iron-icon icon="icons:create" on-tap="_edit" id="[[item.id]]"></iron-icon>
+                                <iron-icon icon="icons:delete" on-tap="_confirmation" id="[[item.id]]"></iron-icon>
+                                <iron-icon icon="icons:content-copy" on-tap="_copy" id="[[item.id]]"></iron-icon>
+                            </div>
+                        </template>
+                    </vaadin-grid-column>
+                </vaadin-grid>
+            </div>
+            <div class="flex" width="100%">
+            <% if class_path[0].nil? %>
+                <markazuna-circular-pager page="[[page]]" count="[[count]]" range="10" url="/<%= plural_name %>?page=#{page}"></markazuna-circular-pager>
+            <% else %>
+                <markazuna-circular-pager page="[[page]]" count="[[count]]" range="10" url="/<%= class_path[0] %>/<%= plural_name %>?page=#{page}"></markazuna-circular-pager>
+            <% end %>
+            </div>
             <paper-fab icon="icons:add" on-tap="_new"></paper-fab>
             <paper-dialog class="card" id="form" modal>
-                <user-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="userForm"></user-form>
+                <<%= singular_name %>-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="<%= singular_name %>Form"></<%= singular_name %>-form>
             </paper-dialog>
             <paper-dialog class="card" id="confirmation" modal>
                 <div class="title"><iron-icon icon="icons:delete"></iron-icon>Delete Data?</div>
@@ -115,7 +132,11 @@ class UserList extends PolymerElement {
             },
             page: {
                 type: Number,
-                value: 0
+                value: 1
+            },
+            count: {
+                type: Number,
+                value: 1
             },
             data: {
                 type: Array,
@@ -139,21 +160,16 @@ class UserList extends PolymerElement {
         this.addEventListener('saveSuccess', this._onSaveSuccess);
         this.addEventListener('editSuccess', this._onEditSuccess);
         this.addEventListener('cancel', this._onCancel);
+        this.addEventListener('pageClick', this._onPageClick);
 
         this.$.dataAjax.url = this.dataUrl + '?page=' + this.page.toString();
         this.$.dataAjax.generateRequest();
         this.$.progress.hidden = false;
-
-        // /* network delay simulation */
-        // self = this;
-        // setTimeout(function() {
-        //     self.$.dataAjax.url = self.dataUrl + '?page=' + self.page.toString();
-        //     self.$.dataAjax.generateRequest();
-        // }, 3000);
     }
 
     _onResponse(data) {
         var response = data.detail.response;
+        this.count = response.count;
         this.splice('data', 0, this.data.length); // clear data
         response.results.forEach(function(item) {
             this.push('data', item);
@@ -170,6 +186,9 @@ class UserList extends PolymerElement {
     _onDeleteResponse(data) {
         var response = data.detail.response;
         if (response.status == '200') {
+            if (response.count < this.count) {
+                this.page = this.page - 1;
+            }
             this._reload();
         }
         else {
@@ -186,15 +205,15 @@ class UserList extends PolymerElement {
     }
 
     _new() {
-        this.$.userForm.icon = 'icons:add';
-        this.$.userForm.title = 'Create New User';
+        this.$.<%= singular_name %>Form.icon = 'icons:add';
+        this.$.<%= singular_name %>Form.title = 'Create New <%= singular_name.capitalize %>';
         this.$.form.open();
     }
 
     _edit(e) {
-        this.$.userForm.icon = 'icons:create';
-        this.$.userForm.title = 'Edit User';
-        this.$.userForm.edit(e.target.id);
+        this.$.<%= singular_name %>Form.icon = 'icons:create';
+        this.$.<%= singular_name %>Form.title = 'Edit <%= singular_name.capitalize %>';
+        this.$.<%= singular_name %>Form.edit(e.target.id);
         this.$.progress.hidden = false;
     }
 
@@ -204,9 +223,9 @@ class UserList extends PolymerElement {
     }
 
     _copy(e) {
-        this.$.userForm.icon = 'icons:content-copy';
-        this.$.userForm.title = 'Copy User';
-        this.$.userForm.copy(e.target.id);
+        this.$.<%= singular_name %>Form.icon = 'icons:content-copy';
+        this.$.<%= singular_name %>Form.title = 'Copy <%= singular_name.capitalize %>';
+        this.$.<%= singular_name %>Form.copy(e.target.id);
         this.$.progress.hidden = false;
     }
 
@@ -234,5 +253,12 @@ class UserList extends PolymerElement {
         this.$.dataAjax.generateRequest();
         this.$.progress.hidden = false;
     }
+
+    _onPageClick(e) {
+        this.page = e.detail.page;
+        this.$.dataAjax.url = this.dataUrl + '?page=' + e.detail.page.toString();
+        this.$.dataAjax.generateRequest();
+        this.$.progress.hidden = false;
+    }
 }
-customElements.define('user-list', UserList);
+customElements.define('<%= singular_name %>-list', <%= singular_name.capitalize %>List);

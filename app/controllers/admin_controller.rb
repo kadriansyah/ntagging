@@ -13,7 +13,7 @@ class AdminController < ApplicationController
                 render template: 'admin/questions'
 
             when 'tags'
-                render template: 'admin/tags'
+                render template: 'alo/tags'
 
             when 'groups'
                 render template: 'admin/groups'

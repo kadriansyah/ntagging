@@ -7,9 +7,9 @@ import '@polymer/iron-ajax/iron-ajax.js';
 import '@polymer/iron-input/iron-input.js';
 import '@polymer/paper-progress/paper-progress.js';
 
-import '../../moslemcorner/moslemcorner-shared-styles.js';
+import './moslemcorner/moslemcorner-shared-styles.js';
 
-class UserForm extends PolymerElement {
+class TagForm extends PolymerElement {
     static get template() {
         return html`
             <style include="shared-styles">
@@ -105,52 +105,24 @@ class UserForm extends PolymerElement {
                     <p class="alert-error">[[_error]]</p>
                 </template>
 
-                <iron-input slot="input" bind-value="{{core_user.id}}">
-                    <input id="id" type="hidden" value="{{core_user.id}}">
+                <iron-input slot="input" bind-value="{{tag.id}}">
+                    <input id="id" type="hidden" value="{{tag.id}}">
                 </iron-input>
-
+                
                 <paper-input-container>
-                    <label slot="label">Email</label>
-                    <iron-input slot="input" bind-value="{{core_user.email}}">
-                        <input id="email" type="text" value="{{core_user.email}}">
+                    <label slot="label">Name</label>
+                    <iron-input slot="input" bind-value="{{tag.name}}">
+                        <input id="name" type="text" value="{{tag.name}}">
                     </iron-input>
                 </paper-input-container>
-
+                
                 <paper-input-container>
-                    <label slot="label">Username</label>
-                    <iron-input slot="input" bind-value="{{core_user.username}}">
-                        <input id="username" type="text" value="{{core_user.username}}">
+                    <label slot="label">Description</label>
+                    <iron-input slot="input" bind-value="{{tag.description}}">
+                        <input id="description" type="text" value="{{tag.description}}">
                     </iron-input>
                 </paper-input-container>
-
-                <paper-input-container>
-                    <label slot="label">Password</label>
-                    <iron-input slot="input" bind-value="{{core_user.password}}">
-                        <input id="password" type="password" value="{{core_user.password}}">
-                    </iron-input>
-                </paper-input-container>
-
-                <paper-input-container>
-                    <label slot="label">Confirm Password</label>
-                    <iron-input slot="input" bind-value="{{core_user.confirmation_password}}">
-                        <input id="confirmationPassword" type="password" value="{{core_user.confirmation_password}}">
-                    </iron-input>
-                </paper-input-container>
-
-                <paper-input-container>
-                    <label slot="label">First Name</label>
-                    <iron-input slot="input" bind-value="{{core_user.firstname}}">
-                        <input id="firstname" type="text" value="{{core_user.firstname}}">
-                    </iron-input>
-                </paper-input-container>
-
-                <paper-input-container>
-                    <label slot="label">Last Name</label>
-                    <iron-input slot="input" bind-value="{{core_user.lastname}}">
-                        <input id="lastname" type="text" value="{{core_user.lastname}}">
-                    </iron-input>
-                </paper-input-container>
-
+                
                 <div class="wrapper-btns">
                     <paper-button class="link" on-tap="_cancel">Cancel</paper-button>
                     <paper-button raised class="indigo" on-tap="_save">Save</paper-button>
@@ -166,7 +138,7 @@ class UserForm extends PolymerElement {
                 type: String,
                 value: ''
             },
-            core_user: {
+            tag: {
                 type: Object,
                 value: {},
                 notify: true
@@ -209,15 +181,15 @@ class UserForm extends PolymerElement {
 
     _onEditResponse(data) {
         var response = data.detail.response;
-        this.core_user = response.payload;
+        this.tag = response.payload;
         if (this._mode === 'copy') {
-            this.core_user.id = ''; // nullify id, we will save it as new document
+            this.tag.id = ''; // nullify id, we will save it as new document
         }
         this.dispatchEvent(new CustomEvent('editSuccess', {bubbles: true, composed: true}));
     }
 
     _onEditError() {
-        this._error = 'Edit User Error';
+        this._error = 'Edit Tag Error';
     }
 
     _onSaveResponse(e) {
@@ -225,17 +197,17 @@ class UserForm extends PolymerElement {
         if (response.status == '200') {
             this._error = '';
             this._mode = 'new';
-            this.core_user = {};
+            this.tag = {};
             this.dispatchEvent(new CustomEvent('saveSuccess', {bubbles: true, composed: true}));
         }
         else {
-            this._error = 'Creating User Error';
+            this._error = 'Creating Tag Error';
         }
         this.$.progress.hidden = true;
     }
 
     _onSaveError() {
-        this._error = 'Creating User Error';
+        this._error = 'Creating Tag Error';
         this.$.progress.hidden = true;
     }
 
@@ -244,31 +216,31 @@ class UserForm extends PolymerElement {
         if (response.status == '200') {
             this._error = '';
             this._mode = 'new';
-            this.core_user = {};
+            this.tag = {};
             this.dispatchEvent(new CustomEvent('saveSuccess', {bubbles: true, composed: true}));
         }
         else {
-            this._error = 'Updating User Error';
+            this._error = 'Updating Tag Error';
         }
         this.$.progress.hidden = true;
     }
 
     _onUpdateError() {
-        this._error = 'Creating User Error';
+        this._error = 'Creating Tag Error';
         this.$.progress.hidden = true;
     }
 
     _save() {
         if (this._mode === 'new' || this._mode === 'copy') {
             this.$.saveAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
-            this.$.saveAjax.body = this.core_user;
+            this.$.saveAjax.body = this.tag;
             this.$.saveAjax.generateRequest();
             this.$.progress.hidden = false;
         }
         else {
             this.$.updateAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
-            this.$.updateAjax.body = this.core_user;
-            this.$.updateAjax.url = this.actionUrl +'/'+ this.core_user.id;
+            this.$.updateAjax.body = this.tag;
+            this.$.updateAjax.url = this.actionUrl +'/'+ this.tag.id;
             this.$.updateAjax.generateRequest();
             this.$.progress.hidden = false;
         }
@@ -277,8 +249,8 @@ class UserForm extends PolymerElement {
     _cancel() {
         this._error = '';
         this._mode = 'new';
-        this.core_user = {};
+        this.tag = {};
         this.dispatchEvent(new CustomEvent('cancel', {bubbles: true, composed: true}));
     }
 }
-customElements.define('user-form', UserForm);
+customElements.define('tag-form', TagForm);

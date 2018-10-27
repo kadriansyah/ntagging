@@ -8,10 +8,10 @@ module Admin
         wrap_parameters :core_user, include: [:id, :email, :username, :password, :confirmation_password, :firstname, :lastname]
 
         def index
-            core_users = admin_service.find_users(params[:page])
+            core_users, page_count = admin_service.find_users(params[:page])
             if (core_users.size > 0)
                 respond_to do |format|
-                    format.json { render :json => { results: core_users }}
+                    format.json { render :json => { results: core_users, count: page_count }}
                 end
             else
                 render :json => { results: []}
@@ -19,9 +19,10 @@ module Admin
         end
 
         def delete
-            if admin_service.delete_user(params[:id])
+            status, page_count = admin_service.delete_user(params[:id])
+            if status
                 respond_to do |format|
-                    format.json { render :json => { status: "200", message: "Success" } }
+                    format.json { render :json => { status: "200", count: page_count } }
                 end
             else
                 respond_to do |format|

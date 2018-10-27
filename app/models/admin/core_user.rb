@@ -1,4 +1,4 @@
-    require 'moslemcorners/common_model'
+require 'moslemcorners/common_model'
 
 class Admin::CoreUser
   include Mongoid::Document

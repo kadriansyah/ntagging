@@ -13,11 +13,11 @@ import 'app-menu-polymer3/app-menu.js'
 import 'app-menu-polymer3/app-submenu.js'
 import 'app-menu-polymer3/app-menu-icon-item.js'
 
-import '../moslemcorner/moslemcorner-shared-styles.js';
-import '../moslemcorner/moslemcorner-search-bar.js';
-import './user-list.js';
+import './moslemcorner/moslemcorner-shared-styles.js';
+import './moslemcorner/moslemcorner-search-bar.js';
+import './tag-list.js';
 
-class UsersPage extends PolymerElement {
+class TagsPage extends PolymerElement {
     static get template() {
         return html`
             <style include="shared-styles">
@@ -127,13 +127,12 @@ class UsersPage extends PolymerElement {
                     </div>
                 </app-toolbar>
             </app-header>
-            <user-list data-url="http://localhost:3000/admin/users" form-authenticity-token="[[formAuthenticityToken]]"></user-list>
+            
+            <tag-list data-url="/admin/tags" form-authenticity-token="[[formAuthenticityToken]]"></tag-list>
+            
             <app-drawer id="drawer" swipe-open slot="drawer">
                 <div id="drawerTitleContainer"><div id="drawerTitle">Main Menu</div></div>
-                <app-menu>
-                    <a class="app-menu-item">
-                        <app-menu-icon-item icon="icons:chrome-reader-mode" on-tap="_openUrl" id="questions">Questions</app-menu-icon-item>
-                    </a>
+                <app-menu selected="0">
                     <a class="app-menu-item">
                         <app-menu-icon-item icon="icons:chrome-reader-mode" on-tap="_openUrl" id="tags">Tags</app-menu-icon-item>
                     </a>
@@ -142,7 +141,7 @@ class UsersPage extends PolymerElement {
                             <app-menu-icon-item icon="icons:accessibility">Access</app-menu-icon-item>
                             <iron-icon icon="expand-more" class="expand-icon"></iron-icon>
                         </div>
-                        <app-menu selected="1" slot="submenu-content">
+                        <app-menu slot="submenu-content">
                             <a class="app-menu-item" on-tap="_openUrl" id="groups">Groups</a>
                             <a class="app-menu-item" on-tap="_openUrl" id="users">Users</a>
                         </app-menu>
@@ -182,7 +181,7 @@ class UsersPage extends PolymerElement {
 
     ready() {
         super.ready();
-        this.title = 'Users';
+        this.title = 'Tags';
     }
 
     _toggleDrawer() {
@@ -193,16 +192,6 @@ class UsersPage extends PolymerElement {
         return !smallScreen;
     }
 
-    _removeFocus(currentSelectedElementId) {
-        // remove current selected paper-item
-        if (currentSelectedElementId == 'groups' || currentSelectedElementId == 'users') {
-            this.$.contentItems.selectIndex(-1);
-        }
-        else {
-            this.$.accessItems.selectIndex(-1);
-        }
-    }
-
     _openUrl(e) {
         var path = this.$.location.path.split('/');
         path[path.length - 1] = e.target.id;
@@ -211,4 +200,4 @@ class UsersPage extends PolymerElement {
         window.location.reload(true);
     }
 }
-customElements.define('users-page', UsersPage);
+customElements.define('tags-page', TagsPage);

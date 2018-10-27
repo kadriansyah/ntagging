@@ -13,10 +13,11 @@ import 'app-menu-polymer3/app-menu.js'
 import 'app-menu-polymer3/app-submenu.js'
 import 'app-menu-polymer3/app-menu-icon-item.js'
 
-import '../moslemcorner/moslemcorner-shared-styles.js';
-import '../moslemcorner/moslemcorner-search-bar.js';
+import './moslemcorner/moslemcorner-shared-styles.js';
+import './moslemcorner/moslemcorner-search-bar.js';
+import './<%= singular_name %>-list.js';
 
-class TagsPage extends PolymerElement {
+class <%= plural_name.capitalize %>Page extends PolymerElement {
     static get template() {
         return html`
             <style include="shared-styles">
@@ -126,15 +127,16 @@ class TagsPage extends PolymerElement {
                     </div>
                 </app-toolbar>
             </app-header>
-            <div>Tags Page</div>
+            <% if class_path[0].nil? %>
+            <<%= singular_name %>-list data-url="/<%= plural_name %>" form-authenticity-token="[[formAuthenticityToken]]"></<%= singular_name %>-list>
+            <% else %>
+            <<%= singular_name %>-list data-url="/<%= class_path[0] %>/<%= plural_name %>" form-authenticity-token="[[formAuthenticityToken]]"></<%= singular_name %>-list>
+            <% end %>
             <app-drawer id="drawer" swipe-open slot="drawer">
                 <div id="drawerTitleContainer"><div id="drawerTitle">Main Menu</div></div>
-                <app-menu selected="1">
+                <app-menu selected="0">
                     <a class="app-menu-item">
-                        <app-menu-icon-item icon="icons:chrome-reader-mode" on-tap="_openUrl" id="questions">Questions</app-menu-icon-item>
-                    </a>
-                    <a class="app-menu-item">
-                        <app-menu-icon-item icon="icons:chrome-reader-mode" on-tap="_openUrl" id="tags">Tags</app-menu-icon-item>
+                        <app-menu-icon-item icon="icons:chrome-reader-mode" on-tap="_openUrl" id="<%= plural_name %>"><%= plural_name.capitalize %></app-menu-icon-item>
                     </a>
                     <app-submenu>
                         <div class="app-menu-item" slot="submenu-trigger">
@@ -181,8 +183,7 @@ class TagsPage extends PolymerElement {
 
     ready() {
         super.ready();
-        self = this;
-        this.title = 'Tags';
+        this.title = '<%= plural_name.capitalize %>';
     }
 
     _toggleDrawer() {
@@ -193,16 +194,6 @@ class TagsPage extends PolymerElement {
         return !smallScreen;
     }
 
-    _removeFocus(currentSelectedElementId) {
-        // remove current selected paper-item
-        if (currentSelectedElementId == 'groups' || currentSelectedElementId == 'users') {
-            this.$.contentItems.selectIndex(-1);
-        }
-        else {
-            this.$.accessItems.selectIndex(-1);
-        }
-    }
-
     _openUrl(e) {
         var path = this.$.location.path.split('/');
         path[path.length - 1] = e.target.id;
@@ -211,4 +202,4 @@ class TagsPage extends PolymerElement {
         window.location.reload(true);
     }
 }
-customElements.define('tags-page', TagsPage);
+customElements.define('<%= plural_name %>-page', <%= plural_name.capitalize %>Page);

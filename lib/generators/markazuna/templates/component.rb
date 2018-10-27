@@ -7,6 +7,6 @@ import '@webcomponents/webcomponentsjs/webcomponents-loader.js'
 /*---------------------------------------------------------------------
   Import Components
 ----------------------------------------------------------------------*/
-import './components/admin/users-page.js'
-import './components/admin/user-list.js'
-import './components/admin/user-form.js'
+import './components/<%= plural_name %>-page.js'
+import './components/<%= singular_name %>-list.js'
+import './components/<%= singular_name %>-form.js'

@@ -10,7 +10,7 @@ module Admin
 
         def delete_user(id)
             core_user = find_user(id)
-            core_user.delete
+            return core_user.delete, Admin::CoreUser.page(1).total_pages
         end
 
         def find_user(id)
@@ -18,7 +18,7 @@ module Admin
         end
 
         def find_users(page = 0)
-            Admin::CoreUser.page(page)
+            return Admin::CoreUser.page(page), Admin::CoreUser.page(1).total_pages
         end
 
         # def create_account(username, password, provider)

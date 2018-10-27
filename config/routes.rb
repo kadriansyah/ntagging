@@ -17,7 +17,12 @@ Rails.application.routes.draw do
         resources :users, controller: 'admin/user' do
             get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
         end
+
+        resources :tags, controller: 'alo/tag' do
+            get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
+        end
     end
-  
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+	resources :tags, controller: 'alo/tag' do
+		get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
+	end
 end

@@ -27,7 +27,7 @@
   "scripts": {
     "postinstall": "rsync -av node_modules/@polymer app/javascript/; rm -rf node_modules/@polymer"
   },
-"devDependencies": {
+  "devDependencies": {
     "webpack-dev-server": "2.11.2"
   }
 }

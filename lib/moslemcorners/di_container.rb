@@ -6,6 +6,10 @@ module MoslemCorners
     class DIContainer
         extend Dry::Container::Mixin
 
+		register 'tag_service' do
+			Alo::TagService.new
+		end
+
         register 'admin_service' do
             Admin::AdminService.new
         end
