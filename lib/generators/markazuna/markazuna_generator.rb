@@ -47,6 +47,13 @@ class MarkazunaGenerator < Rails::Generators::NamedBase
 	def generate_component_files
 		@service_name = options['service_name']
 		@fields = options['fields']
+
+		if class_path[0].nil?
+			@url = "/#{plural_name}"
+		else
+			@url = "/#{class_path[0]}/#{plural_name}"
+		end
+
 		template "component.rb", File.join("app/javascript/packs", "#{plural_name}.js")
 		template "component-page.rb", File.join("app/javascript/packs/components", "#{plural_name}-page.js")
 		template "component-form.rb", File.join("app/javascript/packs/components", "#{singular_name}-form.js")

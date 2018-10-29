@@ -12,9 +12,9 @@ import '@vaadin/vaadin-grid/vaadin-grid-column.js';
 
 import './moslemcorner/markazuna-circular-pager.js';
 import './moslemcorner/moslemcorner-shared-styles.js';
-import './<%= singular_name %>-form.js';
+import './question-form.js';
 
-class <%= singular_name.capitalize %>List extends PolymerElement {
+class QuestionList extends PolymerElement {
     static get template() {
         return html`
             <style include="shared-styles">
@@ -78,18 +78,17 @@ class <%= singular_name.capitalize %>List extends PolymerElement {
             <div class="flex grid-container" width="100%">
                 <paper-progress id="progress" hidden indeterminate></paper-progress>
                 <vaadin-grid theme="row-stripes" aria-label="Users" items="[[data]]">
-                    <%
-                    @fields.each_with_index do |field, index|
-                        if index > 0
-                    %>
-                    <vaadin-grid-column width="20%" flex-grow="0">
-                        <template class="header"><%= field.capitalize %></template>
-                        <template>[[item.<%= field %>]]</template>
+                    
+                    <vaadin-grid-column width="40%" flex-grow="0">
+                        <template class="header">Title</template>
+                        <template>[[item.title]]</template>
                     </vaadin-grid-column>
-                    <%
-                        end
-                    end
-                    %>
+                    
+                    <vaadin-grid-column width="40%" flex-grow="0">
+                        <template class="header">Question</template>
+                        <template>[[item.question_text]]</template>
+                    </vaadin-grid-column>
+                    
                     <vaadin-grid-column width="20%" flex-grow="0">
                         <template class="header"><div class="grid-header">Actions</div></template>
                         <template>
@@ -103,11 +102,11 @@ class <%= singular_name.capitalize %>List extends PolymerElement {
                 </vaadin-grid>
             </div>
             <div class="flex" width="100%">
-                <markazuna-circular-pager page="[[page]]" count="[[count]]" range="10" url="<%= @url %>?page=#{page}"></markazuna-circular-pager>
+                <markazuna-circular-pager page="[[page]]" count="[[count]]" range="10" url="/admin/questions?page=#{page}"></markazuna-circular-pager>
             </div>
             <paper-fab icon="icons:add" on-tap="_new"></paper-fab>
             <paper-dialog class="card" id="form" modal>
-                <<%= singular_name %>-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="<%= singular_name %>Form"></<%= singular_name %>-form>
+                <question-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="questionForm"></question-form>
             </paper-dialog>
             <paper-dialog class="card" id="confirmation" modal>
                 <div class="title"><iron-icon icon="icons:delete"></iron-icon>Delete Data?</div>
@@ -201,15 +200,15 @@ class <%= singular_name.capitalize %>List extends PolymerElement {
     }
 
     _new() {
-        this.$.<%= singular_name %>Form.icon = 'icons:add';
-        this.$.<%= singular_name %>Form.title = 'Create New <%= singular_name.capitalize %>';
+        this.$.questionForm.icon = 'icons:add';
+        this.$.questionForm.title = 'Create New Question';
         this.$.form.open();
     }
 
     _edit(e) {
-        this.$.<%= singular_name %>Form.icon = 'icons:create';
-        this.$.<%= singular_name %>Form.title = 'Edit <%= singular_name.capitalize %>';
-        this.$.<%= singular_name %>Form.edit(e.target.id);
+        this.$.questionForm.icon = 'icons:create';
+        this.$.questionForm.title = 'Edit Question';
+        this.$.questionForm.edit(e.target.id);
         this.$.progress.hidden = false;
     }
 
@@ -219,9 +218,9 @@ class <%= singular_name.capitalize %>List extends PolymerElement {
     }
 
     _copy(e) {
-        this.$.<%= singular_name %>Form.icon = 'icons:content-copy';
-        this.$.<%= singular_name %>Form.title = 'Copy <%= singular_name.capitalize %>';
-        this.$.<%= singular_name %>Form.copy(e.target.id);
+        this.$.questionForm.icon = 'icons:content-copy';
+        this.$.questionForm.title = 'Copy Question';
+        this.$.questionForm.copy(e.target.id);
         this.$.progress.hidden = false;
     }
 
@@ -257,4 +256,4 @@ class <%= singular_name.capitalize %>List extends PolymerElement {
         this.$.progress.hidden = false;
     }
 }
-customElements.define('<%= singular_name %>-list', <%= singular_name.capitalize %>List);
+customElements.define('question-list', QuestionList);

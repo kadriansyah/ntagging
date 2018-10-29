@@ -21,8 +21,9 @@ Rails.application.routes.draw do
         resources :tags, controller: 'alo/tag' do
             get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
         end
+
+        resources :questions, controller: 'alo/question' do
+            get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
+        end
     end
-	resources :tags, controller: 'alo/tag' do
-		get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
-	end
 end

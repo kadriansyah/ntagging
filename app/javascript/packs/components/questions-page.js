@@ -1,11 +1,11 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 
 import { BasePage } from './base-page.js'
-import './<%= singular_name %>-list.js';
+import './question-list.js';
 
-class <%= plural_name.capitalize %>Page extends BasePage {
+class QuestionsPage extends BasePage {
     static get listTemplate() { 
-        return html`<<%= singular_name %>-list data-url="<%= @url %>" form-authenticity-token="[[formAuthenticityToken]]"></<%= singular_name %>-list>`;
+        return html`<question-list data-url="/admin/questions" form-authenticity-token="[[formAuthenticityToken]]"></question-list>`;
     }
 
     constructor() {
@@ -14,7 +14,7 @@ class <%= plural_name.capitalize %>Page extends BasePage {
 
     ready() {
         super.ready();
-        this.title = '<%= plural_name.capitalize %>';
+        this.title = 'Questions';
     }
 
     _openUrl(e) {
@@ -25,4 +25,4 @@ class <%= plural_name.capitalize %>Page extends BasePage {
         window.location.reload(true);
     }
 }
-customElements.define('<%= plural_name %>-page', <%= plural_name.capitalize %>Page);
+customElements.define('questions-page', QuestionsPage);
