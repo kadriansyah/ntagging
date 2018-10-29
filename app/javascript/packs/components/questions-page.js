@@ -15,6 +15,7 @@ class QuestionsPage extends BasePage {
     ready() {
         super.ready();
         this.title = 'Questions';
+        this.$.main_menu.selected = '0';
     }
 
     _openUrl(e) {
