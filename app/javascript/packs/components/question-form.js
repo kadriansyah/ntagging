@@ -119,7 +119,7 @@ class QuestionForm extends PolymerElement {
                 <paper-input-container>
                     <label slot="label">Question</label>
                     <iron-input slot="input" bind-value="{{question.question_text}}">
-                        <input id="question_text" type="text" value="{{question.question_text}}">
+                        <textarea rows="4" cols="50" id="question_text" type="text" value="{{question.question_text}}"></textarea>
                     </iron-input>
                 </paper-input-container>
                 

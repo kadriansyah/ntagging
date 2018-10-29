@@ -29,6 +29,28 @@ styleElement.innerHTML = `
                 font-weight: var(--paper-font-subhead_-_font-weight);
                 line-height: var(--paper-font-subhead_-_line-height);
             }
+            textarea {
+                position: relative;
+                outline: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+                background: transparent;
+                border: none;
+                resize: none;
+                color: var(--paper-input-container-input-color, var(--primary-text-color));
+                -webkit-appearance: none;
+                text-align: inherit;
+                vertical-align: bottom;
+                min-width: 0;
+                font-family: var(--paper-font-subhead_-_font-family);
+                -webkit-font-smoothing: var(--paper-font-subhead_-_-webkit-font-smoothing);
+                font-size: var(--paper-font-subhead_-_font-size);
+                font-weight: var(--paper-font-subhead_-_font-weight);
+                line-height: var(--paper-font-subhead_-_line-height);
+            }
             .card {
                 margin: var(--card-margin, 24px);
                 padding: 20px;
