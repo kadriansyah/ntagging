@@ -8,6 +8,10 @@ class UsersPage extends BasePage {
         return html`<user-list data-url="/admin/users" form-authenticity-token="[[formAuthenticityToken]]"></user-list>`;
     }
 
+    constructor() {
+        super();
+    }
+
     ready() {
         super.ready();
         this.title = 'Users';
