@@ -64,11 +64,6 @@ class QuestionForm extends PolymerElement {
                 #id_wrapper {
                     display: none;
                 }
-                mark{
-                    background: orange;
-                    color: black;
-                    padding: 3px 3px;
-                }
                 paper-dialog#context_menu {
                     position: fixed;
                 }
@@ -77,6 +72,16 @@ class QuestionForm extends PolymerElement {
                 }
                 label-selector:hover {
                     cursor: pointer;
+                }
+                .bg_orange {
+                    background: orange;
+                    color: white;
+                    padding: 3px 3px;
+                }
+                .bg_blue {
+                    background: blue;
+                    color: white;
+                    padding: 3px 3px;
                 }
             </style>
 
@@ -150,11 +155,11 @@ class QuestionForm extends PolymerElement {
             </div>
 
             <paper-dialog id="context_menu" on-iron-overlay-closed="_dismissContextMenu" hidden>
-                <label-selector>Diabetes</label-selector>
-                <label-selector>Batuk</label-selector>
-                <label-selector>Influence</label-selector>
-                <label-selector>Pusing</label-selector>
-                <label-selector>Bahagia</label-selector>
+                <label-selector on-click="_doMarking" data-arg='bg_blue'>Treatment</label-selector>
+                <label-selector on-click="_doMarking" data-arg='bg_orange'>Disease</label-selector>
+                <label-selector on-click="_doMarking" data-arg='bg_orange'>Symtomps</label-selector>
+                <label-selector on-click="_doMarking" data-arg='bg_blue'>Gender</label-selector>
+                <label-selector on-click="_doMarking" data-arg='bg_blue'>Interval</label-selector>
             </paper-dialog>
         `;
     }
@@ -183,6 +188,7 @@ class QuestionForm extends PolymerElement {
                 type: String,
                 value: 'new'
             },
+            selectedText: String,
             _error: String
         };
     }
@@ -208,7 +214,7 @@ class QuestionForm extends PolymerElement {
     }
 
     _onContextMenu(e) {
-        console.log(window.getSelection().toString());
+        this.selectedText = window.getSelection().toString();
         self = this;
         /*
         DOM changes don't take effect until they can be rendered. Javascript is single-threaded
@@ -227,6 +233,18 @@ class QuestionForm extends PolymerElement {
         this.$.context_menu.open();
     }
 
+    _doMarking(e) {
+        console.log(e.target.getAttribute('data-arg'));
+        var options = {};
+        options['element'] = e.target.innerHTML;
+        options['separateWordSearch'] = false;
+        options['className'] = e.target.getAttribute('data-arg');
+        var mark_instance = new Mark(this.$.tagged);
+        mark_instance.mark(this.selectedText, options);
+        this.$.context_menu.hidden = true;
+        this.$.context_menu.close();
+    }
+
     edit(id) {
         this.$.editAjax.url = this.actionUrl +'/'+ id +'/edit';
         this.$.editAjax.generateRequest();
@@ -238,25 +256,6 @@ class QuestionForm extends PolymerElement {
         this.$.editAjax.generateRequest();
         this._mode = 'copy';
     }
-
-    // _onDblClick(e) {
-    //     self = this;
-    //     /*
-    //     DOM changes don't take effect until they can be rendered. Javascript is single-threaded
-    //     (meaning you cannot run two pieces of code simultaneously), and run on the same thread as the render cycle.
-
-    //     Because of this, the renderer cannot fire unless you give it time to look at the new state of the DOM by deferring execution
-    //     of your JS code (using setTimeout or requestAnimationFrame). So unless you give the browser time to render,
-    //     only the final value before the renderer gets to look at the DOM is what matters.
-    //     */
-    //     setTimeout(function(){
-    //         self.$.context_menu.style.left = (e.pageX - 20) + 'px';
-    //         self.$.context_menu.style.top = (e.pageY - 20) + 'px';
-    //         self.$.context_menu.hidden = false;
-    //     }, 1);
-    //     this.$.context_menu.hidden = true;
-    //     this.$.context_menu.open();
-    // }
 
     _dismissContextMenu() {
         this.$.context_menu.close();
@@ -270,10 +269,7 @@ class QuestionForm extends PolymerElement {
         }
         this.dispatchEvent(new CustomEvent('editSuccess', {bubbles: true, composed: true}));
 
-        console.log(this.$.tagged);
         this.$.tagged.innerHTML = this.$.question_text.value;
-        var mark_instance = new Mark(this.$.tagged);
-        mark_instance.mark(this.$.title.value);
     }
 
     _onEditError() {
