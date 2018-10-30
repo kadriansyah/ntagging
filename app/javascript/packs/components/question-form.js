@@ -7,6 +7,7 @@ import '@polymer/iron-ajax/iron-ajax.js';
 import '@polymer/iron-input/iron-input.js';
 import '@polymer/paper-progress/paper-progress.js';
 
+import Mark from 'mark.js/dist/mark.es6.js'
 import './moslemcorner/moslemcorner-shared-styles.js';
 
 class QuestionForm extends PolymerElement {
@@ -42,13 +43,8 @@ class QuestionForm extends PolymerElement {
                 paper-progress {
                     width: 100%;
                 }
-                #formContainer {
-                    width: var(--user-form-width, 100%);
-                    margin: 0 auto;
-                    @apply(--user-form);
-                }
                 .title {
-                    margin-bottom: 10px;
+                    margin-bottom: 0px;
                 }
                 .title > div {
                     display: flex;
@@ -64,6 +60,23 @@ class QuestionForm extends PolymerElement {
                 .title iron-icon {
                     padding: 0;
                     padding-right: 2px;
+                }
+                #id_wrapper {
+                    display: none;
+                }
+                mark{
+                    background: orange;
+                    color: black;
+                    padding: 3px 3px;
+                }
+                paper-dialog#context_menu {
+                    position: fixed;
+                }
+                label-selector {
+                    display: block;
+                }
+                label-selector:hover {
+                    cursor: pointer;
                 }
             </style>
 
@@ -100,12 +113,12 @@ class QuestionForm extends PolymerElement {
                 <paper-progress id="progress" hidden indeterminate></paper-progress>
             </div>
 
-            <div id="formContainer">
+            <div>
                 <template is="dom-if" if="[[_error]]">
                     <p class="alert-error">[[_error]]</p>
                 </template>
 
-                <iron-input slot="input" bind-value="{{question.id}}">
+                <iron-input id="id_wrapper" slot="input" bind-value="{{question.id}}">
                     <input id="id" type="hidden" value="{{question.id}}">
                 </iron-input>
                 
@@ -119,15 +132,30 @@ class QuestionForm extends PolymerElement {
                 <paper-input-container>
                     <label slot="label">Question</label>
                     <iron-input slot="input" bind-value="{{question.question_text}}">
-                        <textarea rows="4" cols="50" id="question_text" type="text" value="{{question.question_text}}"></textarea>
+                        <textarea rows="8" cols="50" id="question_text" type="text" value="{{question.question_text}}"></textarea>
                     </iron-input>
                 </paper-input-container>
+
+                <div>
+                    <p>Tagged Question</p>
+                    <div>
+                        <p id="tagged">TEST</p>
+                    </div>
+                </div>
                 
                 <div class="wrapper-btns">
                     <paper-button class="link" on-tap="_cancel">Cancel</paper-button>
                     <paper-button raised class="indigo" on-tap="_save">Save</paper-button>
                 </div>
             </div>
+
+            <paper-dialog id="context_menu" on-iron-overlay-closed="_dismissContextMenu" hidden>
+                <label-selector>Diabetes</label-selector>
+                <label-selector>Batuk</label-selector>
+                <label-selector>Influence</label-selector>
+                <label-selector>Pusing</label-selector>
+                <label-selector>Bahagia</label-selector>
+            </paper-dialog>
         `;
     }
 
@@ -167,6 +195,38 @@ class QuestionForm extends PolymerElement {
         super.ready();
     }
 
+    connectedCallback() {
+        super.connectedCallback();
+
+        // block contextmenu on document level
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        }, false);
+
+        // register contextmenu event on component level
+        this.addEventListener('contextmenu', this._onContextMenu);
+    }
+
+    _onContextMenu(e) {
+        console.log(window.getSelection().toString());
+        self = this;
+        /*
+        DOM changes don't take effect until they can be rendered. Javascript is single-threaded
+        (meaning you cannot run two pieces of code simultaneously), and run on the same thread as the render cycle.
+
+        Because of this, the renderer cannot fire unless you give it time to look at the new state of the DOM by deferring execution
+        of your JS code (using setTimeout or requestAnimationFrame). So unless you give the browser time to render,
+        only the final value before the renderer gets to look at the DOM is what matters.
+        */
+        setTimeout(function(){
+            self.$.context_menu.style.left = (e.pageX - 20) + 'px';
+            self.$.context_menu.style.top = (e.pageY - 20) + 'px';
+            self.$.context_menu.hidden = false;
+        }, 2);
+        this.$.context_menu.hidden = true;
+        this.$.context_menu.open();
+    }
+
     edit(id) {
         this.$.editAjax.url = this.actionUrl +'/'+ id +'/edit';
         this.$.editAjax.generateRequest();
@@ -179,6 +239,29 @@ class QuestionForm extends PolymerElement {
         this._mode = 'copy';
     }
 
+    // _onDblClick(e) {
+    //     self = this;
+    //     /*
+    //     DOM changes don't take effect until they can be rendered. Javascript is single-threaded
+    //     (meaning you cannot run two pieces of code simultaneously), and run on the same thread as the render cycle.
+
+    //     Because of this, the renderer cannot fire unless you give it time to look at the new state of the DOM by deferring execution
+    //     of your JS code (using setTimeout or requestAnimationFrame). So unless you give the browser time to render,
+    //     only the final value before the renderer gets to look at the DOM is what matters.
+    //     */
+    //     setTimeout(function(){
+    //         self.$.context_menu.style.left = (e.pageX - 20) + 'px';
+    //         self.$.context_menu.style.top = (e.pageY - 20) + 'px';
+    //         self.$.context_menu.hidden = false;
+    //     }, 1);
+    //     this.$.context_menu.hidden = true;
+    //     this.$.context_menu.open();
+    // }
+
+    _dismissContextMenu() {
+        this.$.context_menu.close();
+    }
+
     _onEditResponse(data) {
         var response = data.detail.response;
         this.question = response.payload;
@@ -186,6 +269,11 @@ class QuestionForm extends PolymerElement {
             this.question.id = ''; // nullify id, we will save it as new document
         }
         this.dispatchEvent(new CustomEvent('editSuccess', {bubbles: true, composed: true}));
+
+        console.log(this.$.tagged);
+        this.$.tagged.innerHTML = this.$.question_text.value;
+        var mark_instance = new Mark(this.$.tagged);
+        mark_instance.mark(this.$.title.value);
     }
 
     _onEditError() {

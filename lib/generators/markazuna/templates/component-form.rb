@@ -65,6 +65,9 @@ class <%= singular_name.capitalize %>Form extends PolymerElement {
                     padding: 0;
                     padding-right: 2px;
                 }
+                #id_wrapper {
+                    display: none;
+                }
             </style>
 
             <iron-ajax
@@ -105,7 +108,7 @@ class <%= singular_name.capitalize %>Form extends PolymerElement {
                     <p class="alert-error">[[_error]]</p>
                 </template>
 
-                <iron-input slot="input" bind-value="{{<%= singular_name %>.id}}">
+                <iron-input id="id_wrapper" slot="input" bind-value="{{<%= singular_name %>.id}}">
                     <input id="id" type="hidden" value="{{<%= singular_name %>.id}}">
                 </iron-input>
                 <%
