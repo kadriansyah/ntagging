@@ -18,6 +18,8 @@
     "@polymer/paper-input": "^3.0.1",
     "@polymer/paper-item": "^3.0.1",
     "@polymer/paper-progress": "^3.0.1",
+    "@polymer/paper-radio-button": "^3.0.1",
+    "@polymer/paper-radio-group": "^3.0.1",
     "@polymer/polymer": "^3.0.5",
     "@rails/webpacker": "3.5",
     "@vaadin/vaadin-grid": "^5.2.0",

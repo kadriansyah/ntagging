@@ -6,6 +6,8 @@ import '@polymer/paper-card/paper-card.js';
 import '@polymer/iron-ajax/iron-ajax.js';
 import '@polymer/iron-input/iron-input.js';
 import '@polymer/paper-progress/paper-progress.js';
+import '@polymer/paper-radio-button/paper-radio-button.js';
+import '@polymer/paper-radio-group/paper-radio-group.js';
 
 import Mark from 'mark.js/dist/mark.es6.js'
 import './moslemcorner/moslemcorner-shared-styles.js';
@@ -73,15 +75,8 @@ class QuestionForm extends PolymerElement {
                 label-selector:hover {
                     cursor: pointer;
                 }
-                .bg_orange {
-                    background: orange;
-                    color: white;
-                    padding: 3px 3px;
-                }
-                .bg_blue {
-                    background: blue;
-                    color: white;
-                    padding: 3px 3px;
+                paper-radio-button {
+                    display: block;
                 }
             </style>
 
@@ -155,11 +150,13 @@ class QuestionForm extends PolymerElement {
             </div>
 
             <paper-dialog id="context_menu" on-iron-overlay-closed="_dismissContextMenu" hidden>
-                <label-selector on-click="_doMarking" data-arg='bg_blue'>Treatment</label-selector>
-                <label-selector on-click="_doMarking" data-arg='bg_orange'>Disease</label-selector>
-                <label-selector on-click="_doMarking" data-arg='bg_orange'>Symtomps</label-selector>
-                <label-selector on-click="_doMarking" data-arg='bg_blue'>Gender</label-selector>
-                <label-selector on-click="_doMarking" data-arg='bg_blue'>Interval</label-selector>
+                <paper-radio-group allow-empty-selection>
+                    <paper-radio-button on-change="_doMarking" name="treatment" value="bg_mark_blue">Treatment</paper-radio-button>
+                    <paper-radio-button on-change="_doMarking" name="disease" value="bg_mark_orange">Disease</paper-radio-button>
+                    <paper-radio-button on-change="_doMarking" name="symtomps" value="bg_mark_blue">Symtomps</paper-radio-button>
+                    <paper-radio-button on-change="_doMarking" name="gender" value="bg_mark_orange">Gender</paper-radio-button>
+                    <paper-radio-button on-change="_doMarking" name="interval" value="bg_mark_blue">Interval</paper-radio-button>
+                </paper-radio-group>
             </paper-dialog>
         `;
     }
@@ -234,13 +231,14 @@ class QuestionForm extends PolymerElement {
     }
 
     _doMarking(e) {
-        console.log(e.target.getAttribute('data-arg'));
         var options = {};
-        options['element'] = e.target.innerHTML;
+        options['element'] = e.target.name;
         options['separateWordSearch'] = false;
-        options['className'] = e.target.getAttribute('data-arg');
+        options['className'] = e.target.value;
+
         var mark_instance = new Mark(this.$.tagged);
         mark_instance.mark(this.selectedText, options);
+
         this.$.context_menu.hidden = true;
         this.$.context_menu.close();
     }
