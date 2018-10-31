@@ -83,6 +83,9 @@ class QuestionForm extends PolymerElement {
                     padding: 5px 10px;
                     margin-right: 2px;
                 }
+                #tagged {
+                    line-height: 180%;
+                }
                 #label_container {
                     padding-top: 5px;
                     border-top: 1px solid #757575;
@@ -243,7 +246,7 @@ class QuestionForm extends PolymerElement {
             self.$.context_menu.style.left = (e.pageX - 20) + 'px';
             self.$.context_menu.style.top = (e.pageY - 20) + 'px';
             self.$.context_menu.hidden = false;
-        }, 2);
+        }, 250);
         this.$.context_menu.hidden = true;
         this.$.context_menu.open();
     }
@@ -251,15 +254,16 @@ class QuestionForm extends PolymerElement {
     _onRadioChange(e) {
         if (e.target.checked == true) {
             if (this.parentTextNode.nodeName.toLowerCase() == 'p') {
-                self = this;
-
                 var options = {};
                 options['element'] = e.target.name;
                 options['separateWordSearch'] = false;
                 options['className'] = e.target.value;
+
                 if (this.exclude[this.selectedText] != null) {
                     options['exclude'] = Array.from(this.exclude[this.selectedText]);
                 }
+
+                self = this;
                 options['done'] = function(counter) {
                     var span = self.shadowRoot.getElementById(e.target.name);
                     if (span == null) {
@@ -292,7 +296,6 @@ class QuestionForm extends PolymerElement {
                 this.$.context_menu.close();
             }
             else {
-                console.log(this.parentTextNode.nodeName);
                 var spanId = this.parentTextNode.nodeName.toLowerCase();
 
                 // umark first
@@ -302,7 +305,7 @@ class QuestionForm extends PolymerElement {
                 var count = this.countLabel[spanId] - 1;
                 var span = this.shadowRoot.getElementById(spanId);
                 span.textContent = spanId + ` (${count})`;
-                self.countLabel[spanId] = count;
+                this.countLabel[spanId] = count;
 
                 // mark with new label
                 var options = {};
@@ -310,6 +313,8 @@ class QuestionForm extends PolymerElement {
                 options['separateWordSearch'] = false;
                 options['className'] = e.target.value;
                 options['exclude'] = Array.from(this.exclude[this.selectedText]);
+
+                self = this;
                 options['done'] = function(counter) {
                     var span = self.shadowRoot.getElementById(e.target.name);
                     if (span == null) {
@@ -342,12 +347,19 @@ class QuestionForm extends PolymerElement {
             mark_instance.unmark(this.selectedText, options);
 
             var count = this.countLabel[e.target.name] - 1;
-            var span = self.shadowRoot.getElementById(e.target.name);
+            var span = this.shadowRoot.getElementById(e.target.name);
             span.textContent = e.target.name + ` (${count})`;
             this.countLabel[e.target.name] = count;
 
             this.$.context_menu.hidden = true;
             this.$.context_menu.close();
+        }
+    }
+
+    _clearLabel() {
+        var label_container = this.shadowRoot.getElementById('label_container');
+        while (label_container.firstChild) {
+            label_container.removeChild(label_container.firstChild);
         }
     }
 
@@ -421,6 +433,7 @@ class QuestionForm extends PolymerElement {
     }
 
     _save() {
+        this._clearLabel();
         if (this._mode === 'new' || this._mode === 'copy') {
             this.$.saveAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
             this.$.saveAjax.body = this.question;
@@ -437,6 +450,7 @@ class QuestionForm extends PolymerElement {
     }
 
     _cancel() {
+        this._clearLabel();
         this._error = '';
         this._mode = 'new';
         this.question = {};
