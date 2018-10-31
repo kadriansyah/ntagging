@@ -77,6 +77,21 @@ styleElement.innerHTML = `
                 color: white;
                 padding: 3px 3px;
             }
+            .bg_mark_red {
+                background: red;
+                color: white;
+                padding: 3px 3px;
+            }
+            .bg_mark_black {
+                background: black;
+                color: white;
+                padding: 3px 3px;
+            }
+            .bg_mark_green {
+                background: green;
+                color: white;
+                padding: 3px 3px;
+            }
         </style>
     </template>
 `;

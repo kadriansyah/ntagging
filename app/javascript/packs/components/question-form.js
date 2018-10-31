@@ -139,7 +139,7 @@ class QuestionForm extends PolymerElement {
                 <div>
                     <p>Tagged Question</p>
                     <div>
-                        <p id="tagged">TEST</p>
+                        <p id="tagged"></p>
                     </div>
                 </div>
                 
@@ -150,12 +150,12 @@ class QuestionForm extends PolymerElement {
             </div>
 
             <paper-dialog id="context_menu" on-iron-overlay-closed="_dismissContextMenu" hidden>
-                <paper-radio-group allow-empty-selection>
-                    <paper-radio-button on-change="_doMarking" name="treatment" value="bg_mark_blue">Treatment</paper-radio-button>
-                    <paper-radio-button on-change="_doMarking" name="disease" value="bg_mark_orange">Disease</paper-radio-button>
-                    <paper-radio-button on-change="_doMarking" name="symtomps" value="bg_mark_blue">Symtomps</paper-radio-button>
-                    <paper-radio-button on-change="_doMarking" name="gender" value="bg_mark_orange">Gender</paper-radio-button>
-                    <paper-radio-button on-change="_doMarking" name="interval" value="bg_mark_blue">Interval</paper-radio-button>
+                <paper-radio-group id="label_group" allow-empty-selection>
+                    <paper-radio-button on-change="_onRadioChange" name="treatment" value="bg_mark_blue">Treatment</paper-radio-button>
+                    <paper-radio-button on-change="_onRadioChange" name="disease" value="bg_mark_orange">Disease</paper-radio-button>
+                    <paper-radio-button on-change="_onRadioChange" name="symtomps" value="bg_mark_red">Symtomps</paper-radio-button>
+                    <paper-radio-button on-change="_onRadioChange" name="gender" value="bg_mark_green">Gender</paper-radio-button>
+                    <paper-radio-button on-change="_onRadioChange" name="interval" value="bg_mark_black">Interval</paper-radio-button>
                 </paper-radio-group>
             </paper-dialog>
         `;
@@ -186,6 +186,8 @@ class QuestionForm extends PolymerElement {
                 value: 'new'
             },
             selectedText: String,
+            exclude: Object,
+            parentTextNode: Object,
             _error: String
         };
     }
@@ -196,6 +198,7 @@ class QuestionForm extends PolymerElement {
 
     ready() {
         super.ready();
+        this.exclude = {};
     }
 
     connectedCallback() {
@@ -211,7 +214,9 @@ class QuestionForm extends PolymerElement {
     }
 
     _onContextMenu(e) {
-        this.selectedText = window.getSelection().toString();
+        this.parentTextNode = this.shadowRoot.getSelection().anchorNode.parentNode;
+        this.$.label_group.selected = this.shadowRoot.getSelection().anchorNode.parentNode.nodeName.toLowerCase();
+        this.selectedText = this.shadowRoot.getSelection().toString();
         self = this;
         /*
         DOM changes don't take effect until they can be rendered. Javascript is single-threaded
@@ -230,17 +235,61 @@ class QuestionForm extends PolymerElement {
         this.$.context_menu.open();
     }
 
-    _doMarking(e) {
-        var options = {};
-        options['element'] = e.target.name;
-        options['separateWordSearch'] = false;
-        options['className'] = e.target.value;
+    _onRadioChange(e) {
+        if (e.target.checked == true) {
+            if (this.parentTextNode.nodeName.toLowerCase() == 'p') {
+                var options = {};
+                options['element'] = e.target.name;
+                options['separateWordSearch'] = false;
+                options['className'] = e.target.value;
+                if (this.exclude[this.selectedText] == null) {
+                    this.exclude[this.selectedText] = new Set([e.target.name]);
+                }
+                else {
+                    this.exclude[this.selectedText].add(e.target.name);
+                }
 
-        var mark_instance = new Mark(this.$.tagged);
-        mark_instance.mark(this.selectedText, options);
+                var mark_instance = new Mark(this.$.tagged);
+                mark_instance.mark(this.selectedText, options);
 
-        this.$.context_menu.hidden = true;
-        this.$.context_menu.close();
+                this.$.context_menu.hidden = true;
+                this.$.context_menu.close();
+            }
+            else {
+                console.log(this.exclude);
+
+                // umark first
+                var mark_instance = new Mark(this.parentTextNode);
+                mark_instance.unmark(this.selectedText);
+
+                // mark with new label
+                var options = {};
+                options['element'] = e.target.name;
+                options['separateWordSearch'] = false;
+                options['className'] = e.target.value;
+                options['exclude'] = Array.from(this.exclude[this.selectedText]);
+
+                var mark_instance = new Mark(this.$.tagged);
+                mark_instance.mark(this.selectedText, options);
+
+                this.exclude[this.selectedText].add(e.target.name);
+
+                this.$.context_menu.hidden = true;
+                this.$.context_menu.close();
+            }
+        }
+        else {
+            var options = {};
+            options['element'] = e.target.name;
+            options['separateWordSearch'] = false;
+            options['className'] = e.target.value;
+
+            var mark_instance = new Mark(this.parentTextNode);
+            mark_instance.unmark(this.selectedText, options);
+
+            this.$.context_menu.hidden = true;
+            this.$.context_menu.close();
+        }
     }
 
     edit(id) {
