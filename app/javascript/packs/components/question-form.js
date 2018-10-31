@@ -80,8 +80,12 @@ class QuestionForm extends PolymerElement {
                 }
                 .label {
                     color: white;
-                    padding: 8px;
+                    padding: 5px 10px;
                     margin-right: 2px;
+                }
+                #label_container {
+                    padding-top: 5px;
+                    border-top: 1px solid #757575;
                 }
             </style>
 
@@ -148,9 +152,7 @@ class QuestionForm extends PolymerElement {
                     </div>
                 </div>
                 
-                <div id="label_container">
-                    
-                </div>
+                <div id="label_container"></div>
 
                 <div class="wrapper-btns">
                     <paper-button class="link" on-tap="_cancel">Cancel</paper-button>
