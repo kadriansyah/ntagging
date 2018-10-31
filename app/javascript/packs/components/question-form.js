@@ -78,6 +78,11 @@ class QuestionForm extends PolymerElement {
                 paper-radio-button {
                     display: block;
                 }
+                .label {
+                    color: white;
+                    padding: 8px;
+                    margin-right: 2px;
+                }
             </style>
 
             <iron-ajax
@@ -143,6 +148,10 @@ class QuestionForm extends PolymerElement {
                     </div>
                 </div>
                 
+                <div id="label_container">
+                    
+                </div>
+
                 <div class="wrapper-btns">
                     <paper-button class="link" on-tap="_cancel">Cancel</paper-button>
                     <paper-button raised class="indigo" on-tap="_save">Save</paper-button>
@@ -185,8 +194,9 @@ class QuestionForm extends PolymerElement {
                 type: String,
                 value: 'new'
             },
-            selectedText: String,
             exclude: Object,
+            countLabel: Object,
+            selectedText: String,
             parentTextNode: Object,
             _error: String
         };
@@ -199,6 +209,7 @@ class QuestionForm extends PolymerElement {
     ready() {
         super.ready();
         this.exclude = {};
+        this.countLabel = {};
     }
 
     connectedCallback() {
@@ -238,10 +249,33 @@ class QuestionForm extends PolymerElement {
     _onRadioChange(e) {
         if (e.target.checked == true) {
             if (this.parentTextNode.nodeName.toLowerCase() == 'p') {
+                self = this;
+
                 var options = {};
                 options['element'] = e.target.name;
                 options['separateWordSearch'] = false;
                 options['className'] = e.target.value;
+                if (this.exclude[this.selectedText] != null) {
+                    options['exclude'] = Array.from(this.exclude[this.selectedText]);
+                }
+                options['done'] = function(counter) {
+                    var span = self.shadowRoot.getElementById(e.target.name);
+                    if (span == null) {
+                        var span = document.createElement('span');
+                        span.id = e.target.name;
+                        span.className = 'label '+ e.target.value;
+                        span.textContent = e.target.name + ` (${counter})`;
+                        self.$.label_container.appendChild(span);
+                        self.countLabel[e.target.name] = counter;
+                    }
+                    else {
+                        var count = self.countLabel[e.target.name] + counter;
+                        var span = self.shadowRoot.getElementById(e.target.name);
+                        span.textContent = e.target.name + ` (${count})`;
+                        self.countLabel[e.target.name] = count;
+                    }
+                };
+
                 if (this.exclude[this.selectedText] == null) {
                     this.exclude[this.selectedText] = new Set([e.target.name]);
                 }
@@ -256,11 +290,17 @@ class QuestionForm extends PolymerElement {
                 this.$.context_menu.close();
             }
             else {
-                console.log(this.exclude);
+                console.log(this.parentTextNode.nodeName);
+                var spanId = this.parentTextNode.nodeName.toLowerCase();
 
                 // umark first
                 var mark_instance = new Mark(this.parentTextNode);
                 mark_instance.unmark(this.selectedText);
+
+                var count = this.countLabel[spanId] - 1;
+                var span = this.shadowRoot.getElementById(spanId);
+                span.textContent = spanId + ` (${count})`;
+                self.countLabel[spanId] = count;
 
                 // mark with new label
                 var options = {};
@@ -268,6 +308,23 @@ class QuestionForm extends PolymerElement {
                 options['separateWordSearch'] = false;
                 options['className'] = e.target.value;
                 options['exclude'] = Array.from(this.exclude[this.selectedText]);
+                options['done'] = function(counter) {
+                    var span = self.shadowRoot.getElementById(e.target.name);
+                    if (span == null) {
+                        var span = document.createElement('span');
+                        span.id = e.target.name;
+                        span.className = 'label '+ e.target.value;
+                        span.textContent = e.target.name + ` (${counter})`;
+                        self.$.label_container.appendChild(span);
+                        self.countLabel[e.target.name] = counter;
+                    }
+                    else {
+                        var count = self.countLabel[e.target.name] + counter;
+                        var span = self.shadowRoot.getElementById(e.target.name);
+                        span.textContent = e.target.name + ` (${count})`;
+                        self.countLabel[e.target.name] = count;
+                    }
+                };
 
                 var mark_instance = new Mark(this.$.tagged);
                 mark_instance.mark(this.selectedText, options);
@@ -279,13 +336,13 @@ class QuestionForm extends PolymerElement {
             }
         }
         else {
-            var options = {};
-            options['element'] = e.target.name;
-            options['separateWordSearch'] = false;
-            options['className'] = e.target.value;
-
             var mark_instance = new Mark(this.parentTextNode);
             mark_instance.unmark(this.selectedText, options);
+
+            var count = this.countLabel[e.target.name] - 1;
+            var span = self.shadowRoot.getElementById(e.target.name);
+            span.textContent = e.target.name + ` (${count})`;
+            this.countLabel[e.target.name] = count;
 
             this.$.context_menu.hidden = true;
             this.$.context_menu.close();
