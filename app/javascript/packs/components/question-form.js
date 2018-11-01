@@ -253,16 +253,6 @@ class QuestionForm extends PolymerElement {
         this.$.context_menu.open();
     }
 
-    _isSuperset(text) {
-        const keys = Object.keys(this.registry);
-        for(var i in keys) {
-            if (text.includes(keys[i]) && this.registry[keys[i]] > 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     _addRegistry(keyword, count) {
         if (this.registry[keyword] == null) {
             this.registry[keyword] = count;
@@ -276,17 +266,27 @@ class QuestionForm extends PolymerElement {
         this.registry[keyword] = this.registry[keyword] - count;
     }
 
+    _updateLabel(span, label, className, counter) {
+        if (span == null) {
+            var span = document.createElement('span');
+            span.id = label;
+            span.className = `label ${className}`;
+            span.textContent = `${label} (${counter})`;
+            this.$.label_container.appendChild(span);
+            this.countLabel[label] = counter;
+        }
+        else {
+            var count = this.countLabel[label] + counter;
+            var span = this.shadowRoot.getElementById(label);
+            span.textContent = `${label} (${count})`;
+            this.countLabel[label] = count;
+        }
+    }
+
     _onRadioChange(e) {
         self = this;
         if (e.target.checked == true) {
             if (this.parentTextNode.nodeName.toLowerCase() == 'p') {
-                // disallow marking from subset to superset
-                if (this._isSuperset(this.selectedText)) {
-                    this.$.context_menu.hidden = true;
-                    this.$.context_menu.close();
-                    return;
-                }
-
                 var options = {};
                 options['element'] = e.target.name;
                 options['separateWordSearch'] = false;
@@ -300,20 +300,7 @@ class QuestionForm extends PolymerElement {
                 options['done'] = function(counter) {
                     self._addRegistry(self.selectedText, counter);
                     var span = self.shadowRoot.getElementById(e.target.name);
-                    if (span == null) {
-                        var span = document.createElement('span');
-                        span.id = e.target.name;
-                        span.className = `label ${e.target.value}`;
-                        span.textContent = `${e.target.name} (${counter})`;
-                        self.$.label_container.appendChild(span);
-                        self.countLabel[e.target.name] = counter;
-                    }
-                    else {
-                        var count = self.countLabel[e.target.name] + counter;
-                        var span = self.shadowRoot.getElementById(e.target.name);
-                        span.textContent = `${e.target.name} (${count})`;
-                        self.countLabel[e.target.name] = count;
-                    }
+                    self._updateLabel(span, e.target.name, e.target.value, counter);
                 };
 
                 if (this.exclude[this.selectedText] == null) {
@@ -330,19 +317,16 @@ class QuestionForm extends PolymerElement {
                 this.$.context_menu.close();
             }
             else {
-                var spanId = this.parentTextNode.nodeName.toLowerCase();
-
                 // do not umark if selectedText is part of tagged text
                 var keyword = this.parentTextNode.textContent;
                 if (this.parentTextNode.textContent.includes(this.selectedText) && this.parentTextNode.textContent.length == this.selectedText.length) {
+                    // swap label case
                     var mark_instance = new Mark(this.parentTextNode);
                     mark_instance.unmark(this.selectedText);
-                }
 
-                var count = this.countLabel[spanId] - 1;
-                var span = this.shadowRoot.getElementById(spanId);
-                span.textContent = spanId + ` (${count})`;
-                this.countLabel[spanId] = count;
+                    var span = this.shadowRoot.getElementById(this.parentTextNode.nodeName.toLowerCase());
+                    self._updateLabel(span, this.parentTextNode.nodeName.toLowerCase(), null, -1);
+                }
 
                 // mark with new label
                 var options = {};
@@ -360,20 +344,7 @@ class QuestionForm extends PolymerElement {
                         self._addRegistry(self.selectedText, counter);
                     }
                     var span = self.shadowRoot.getElementById(e.target.name);
-                    if (span == null) {
-                        var span = document.createElement('span');
-                        span.id = e.target.name;
-                        span.className = 'label '+ e.target.value;
-                        span.textContent = `${e.target.name} (${counter})`;
-                        self.$.label_container.appendChild(span);
-                        self.countLabel[e.target.name] = counter;
-                    }
-                    else {
-                        var count = self.countLabel[e.target.name] + counter;
-                        var span = self.shadowRoot.getElementById(e.target.name);
-                        span.textContent = `${e.target.name} (${count})`;
-                        self.countLabel[e.target.name] = count;
-                    }
+                    self._updateLabel(span, e.target.name, e.target.value, counter);
                 };
 
                 var mark_instance = new Mark(this.$.tagged);
@@ -396,22 +367,23 @@ class QuestionForm extends PolymerElement {
             var mark_instance = new Mark(this.parentTextNode);
             mark_instance.unmark(this.selectedText, options);
 
-            var count = this.countLabel[e.target.name] - 1;
             var span = this.shadowRoot.getElementById(e.target.name);
-            span.textContent = e.target.name + ` (${count})`;
-            this.countLabel[e.target.name] = count;
+            this._updateLabel(span, e.target.name, e.target.value, -1);
 
             this.$.context_menu.hidden = true;
             this.$.context_menu.close();
         }
-        // console.log(this.registry);
+        console.log(this.registry);
     }
 
-    _clearLabel() {
+    _clearData() {
         var label_container = this.shadowRoot.getElementById('label_container');
         while (label_container.firstChild) {
             label_container.removeChild(label_container.firstChild);
         }
+        this.exclude = {};
+        this.registry = {};
+        this.countLabel = {};
     }
 
     edit(id) {
@@ -496,7 +468,7 @@ class QuestionForm extends PolymerElement {
     _save() {
         this.question.question_tag = this.$.tagged.innerHTML;
         this.question.question_label = this.$.label_container.innerHTML;
-        this._clearLabel();
+        this._clearData();
 
         if (this._mode === 'new' || this._mode === 'copy') {
             this.$.saveAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
@@ -517,7 +489,7 @@ class QuestionForm extends PolymerElement {
         this._error = '';
         this._mode = 'new';
         this.question = {};
-        this._clearLabel();
+        this._clearData();
         this.dispatchEvent(new CustomEvent('cancel', {bubbles: true, composed: true}));
     }
 }
