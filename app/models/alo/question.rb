@@ -9,7 +9,7 @@ class Alo::Question
     paginates_per 10
 	
     field :title, type: String, default: ''
-	
     field :question_text, type: String, default: ''
+    field :question_tag, type: String, default: ''
 	
 end

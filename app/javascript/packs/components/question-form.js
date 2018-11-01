@@ -151,7 +151,7 @@ class QuestionForm extends PolymerElement {
                 <div>
                     <p>Tagged Question</p>
                     <div>
-                        <p id="tagged"></p>
+                        <p id="tagged">{{question.question_tag}}</p>
                     </div>
                 </div>
                 
@@ -233,7 +233,6 @@ class QuestionForm extends PolymerElement {
         this.parentTextNode = this.shadowRoot.getSelection().anchorNode.parentNode;
         this.$.label_group.selected = this.shadowRoot.getSelection().anchorNode.parentNode.nodeName.toLowerCase();
         this.selectedText = this.shadowRoot.getSelection().toString();
-        self = this;
         /*
         DOM changes don't take effect until they can be rendered. Javascript is single-threaded
         (meaning you cannot run two pieces of code simultaneously), and run on the same thread as the render cycle.
@@ -242,6 +241,7 @@ class QuestionForm extends PolymerElement {
         of your JS code (using setTimeout or requestAnimationFrame). So unless you give the browser time to render,
         only the final value before the renderer gets to look at the DOM is what matters.
         */
+        self = this;
         setTimeout(function(){
             self.$.context_menu.style.left = (e.pageX - 20) + 'px';
             self.$.context_menu.style.top = (e.pageY - 20) + 'px';
@@ -252,32 +252,33 @@ class QuestionForm extends PolymerElement {
     }
 
     _onRadioChange(e) {
+        self = this;
         if (e.target.checked == true) {
             if (this.parentTextNode.nodeName.toLowerCase() == 'p') {
                 var options = {};
                 options['element'] = e.target.name;
                 options['separateWordSearch'] = false;
                 options['className'] = e.target.value;
+                options['acrossElements'] = true;
 
                 if (this.exclude[this.selectedText] != null) {
                     options['exclude'] = Array.from(this.exclude[this.selectedText]);
                 }
 
-                self = this;
                 options['done'] = function(counter) {
                     var span = self.shadowRoot.getElementById(e.target.name);
                     if (span == null) {
                         var span = document.createElement('span');
                         span.id = e.target.name;
-                        span.className = 'label '+ e.target.value;
-                        span.textContent = e.target.name + ` (${counter})`;
+                        span.className = `label ${e.target.value}`;
+                        span.textContent = `${e.target.name} (${counter})`;
                         self.$.label_container.appendChild(span);
                         self.countLabel[e.target.name] = counter;
                     }
                     else {
                         var count = self.countLabel[e.target.name] + counter;
                         var span = self.shadowRoot.getElementById(e.target.name);
-                        span.textContent = e.target.name + ` (${count})`;
+                        span.textContent = `${e.target.name} (${count})`;
                         self.countLabel[e.target.name] = count;
                     }
                 };
@@ -298,9 +299,12 @@ class QuestionForm extends PolymerElement {
             else {
                 var spanId = this.parentTextNode.nodeName.toLowerCase();
 
-                // umark first
-                var mark_instance = new Mark(this.parentTextNode);
-                mark_instance.unmark(this.selectedText);
+                // umark only if selectedText is not part of tagged text
+                console.log(this.parentTextNode.textContent);
+                if (!this.parentTextNode.textContent.includes(this.selectedText)) {
+                    var mark_instance = new Mark(this.parentTextNode);
+                    mark_instance.unmark(this.selectedText);
+                }
 
                 var count = this.countLabel[spanId] - 1;
                 var span = this.shadowRoot.getElementById(spanId);
@@ -312,23 +316,25 @@ class QuestionForm extends PolymerElement {
                 options['element'] = e.target.name;
                 options['separateWordSearch'] = false;
                 options['className'] = e.target.value;
-                options['exclude'] = Array.from(this.exclude[this.selectedText]);
-
-                self = this;
+                options['acrossElements'] = true;
+                if (this.exclude[this.selectedText] != null) {
+                    options['exclude'] = Array.from(this.exclude[this.selectedText]);
+                }
+                
                 options['done'] = function(counter) {
                     var span = self.shadowRoot.getElementById(e.target.name);
                     if (span == null) {
                         var span = document.createElement('span');
                         span.id = e.target.name;
                         span.className = 'label '+ e.target.value;
-                        span.textContent = e.target.name + ` (${counter})`;
+                        span.textContent = `${e.target.name} (${counter})`;
                         self.$.label_container.appendChild(span);
                         self.countLabel[e.target.name] = counter;
                     }
                     else {
                         var count = self.countLabel[e.target.name] + counter;
                         var span = self.shadowRoot.getElementById(e.target.name);
-                        span.textContent = e.target.name + ` (${count})`;
+                        span.textContent = `${e.target.name} (${count})`;
                         self.countLabel[e.target.name] = count;
                     }
                 };
@@ -336,7 +342,12 @@ class QuestionForm extends PolymerElement {
                 var mark_instance = new Mark(this.$.tagged);
                 mark_instance.mark(this.selectedText, options);
 
-                this.exclude[this.selectedText].add(e.target.name);
+                if (this.exclude[this.selectedText] == null) {
+                    this.exclude[this.selectedText] = new Set([e.target.name]);
+                }
+                else {
+                    this.exclude[this.selectedText].add(e.target.name);
+                }
 
                 this.$.context_menu.hidden = true;
                 this.$.context_menu.close();
@@ -387,7 +398,12 @@ class QuestionForm extends PolymerElement {
         }
         this.dispatchEvent(new CustomEvent('editSuccess', {bubbles: true, composed: true}));
 
-        this.$.tagged.innerHTML = this.$.question_text.value;
+        if (this.question.question_tag.length === 0 || !this.question.question_tag) {
+            this.$.tagged.innerHTML = this.question.question_text;
+        }
+        else {
+            this.$.tagged.innerHTML = this.question.question_tag;
+        }
     }
 
     _onEditError() {
@@ -434,6 +450,7 @@ class QuestionForm extends PolymerElement {
 
     _save() {
         this._clearLabel();
+        this.question.question_tag = this.$.tagged.innerHTML;
         if (this._mode === 'new' || this._mode === 'copy') {
             this.$.saveAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
             this.$.saveAjax.body = this.question;
