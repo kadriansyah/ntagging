@@ -12,4 +12,5 @@ class Alo::Question
     field :question_text, type: String, default: ''
     field :question_tag, type: String, default: ''
     field :question_label, type: String, default: ''
+    field :metadata, type: String, default: ''
 end

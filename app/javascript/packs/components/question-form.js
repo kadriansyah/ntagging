@@ -212,7 +212,7 @@ class QuestionForm extends PolymerElement {
             },
             exclude: Object,
             registry: Object,
-            countLabel: Object,
+            labelCount: Object,
             selectedText: String,
             parentTextNode: Object,
             _error: String
@@ -227,7 +227,7 @@ class QuestionForm extends PolymerElement {
         super.ready();
         this.exclude = {};
         this.registry = {};
-        this.countLabel = {};
+        this.labelCount = {};
     }
 
     connectedCallback() {
@@ -304,13 +304,13 @@ class QuestionForm extends PolymerElement {
             span.className = `label ${className}`;
             span.textContent = `${label} (${counter})`;
             this.$.label_container.appendChild(span);
-            this.countLabel[label] = counter;
+            this.labelCount[label] = counter;
         }
         else {
-            var count = this.countLabel[label] + counter;
+            var count = this.labelCount[label] + counter;
             var span = this.shadowRoot.getElementById(label);
             span.textContent = `${label} (${count})`;
-            this.countLabel[label] = count;
+            this.labelCount[label] = count;
         }
     }
 
@@ -418,7 +418,7 @@ class QuestionForm extends PolymerElement {
         }
         this.exclude = {};
         this.registry = {};
-        this.countLabel = {};
+        this.labelCount = {};
     }
 
     edit(id) {
@@ -454,6 +454,17 @@ class QuestionForm extends PolymerElement {
         if (this.question.question_label.length > 0 && this.question.question_label) {
             this.$.label_container.innerHTML = this.question.question_label;
         }
+
+        // load metadata
+        var metadata = this.question.metadata.split('-');
+        function Array_toSet(key, value) {
+            if (typeof value === 'object' && value instanceof Array) {
+                return new Set(value);
+            }
+            return value;
+        }
+        this.exclude = JSON.parse(metadata[0], Array_toSet);
+        this.labelCount = JSON.parse(metadata[1]);
 
         this.dispatchEvent(new CustomEvent('editSuccess', {bubbles: true, composed: true}));
     }
@@ -503,8 +514,19 @@ class QuestionForm extends PolymerElement {
     _save() {
         this.question.question_tag = this.$.tagged.innerHTML;
         this.question.question_label = this.$.label_container.innerHTML;
-        this._clearData();
 
+        // save metadata
+        function Set_toJSON(key, value) {
+            if (typeof value === 'object' && value instanceof Set) {
+                return [...value];
+            }
+            return value;
+        }
+        var exclude = JSON.stringify(this.exclude, Set_toJSON);
+        var lacount = JSON.stringify(this.labelCount);
+        this.question.metadata = exclude +'-'+lacount;
+
+        this._clearData();
         if (this._mode === 'new' || this._mode === 'copy') {
             this.$.saveAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
             this.$.saveAjax.body = this.question;
