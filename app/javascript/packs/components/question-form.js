@@ -362,7 +362,12 @@ class QuestionForm extends PolymerElement {
             }
         }
         else {
-            this._subRegistry(this.selectedText, 1);
+            if (this.parentTextNode.textContent.includes(this.selectedText) && this.parentTextNode.textContent.length == this.selectedText.length) {
+                this._subRegistry(this.selectedText, 1);
+            }
+            else {
+                this._subRegistry(this.parentTextNode.textContent, 1); // case: select text part on tagged text
+            }
 
             var mark_instance = new Mark(this.parentTextNode);
             mark_instance.unmark(this.selectedText, options);
