@@ -2,18 +2,16 @@
 class Alo::TagForm
     include ActiveModel::Model
 
-    attr_accessor(:id, :name, :description)
+    attr_accessor(:id, :name, :value, :css)
 
     # Validations
-    
     validates :name, presence: true
-    
-    validates :description, presence: true
-    
+    validates :value, presence: true
+    validates :css, presence: true
 
     def save
         if valid?
-            tag = Alo::Tag.new(name: self.name, description: self.description)
+            tag = Alo::Tag.new(name: self.name, value: self.value, css: self.css)
             tag.save
             true
         else
@@ -24,7 +22,7 @@ class Alo::TagForm
     def update
         if valid?
             tag = Alo::Tag.find(self.id)
-            tag.update_attributes!(name: self.name, description: self.description)
+            tag.update_attributes!(name: self.name, value: self.value, css: self.css)
             true
         else
             false

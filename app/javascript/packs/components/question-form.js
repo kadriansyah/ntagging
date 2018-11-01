@@ -93,6 +93,13 @@ class QuestionForm extends PolymerElement {
             </style>
 
             <iron-ajax
+                id="dataAjax"
+                handle-as="json"
+                on-response="_onResponse"
+                on-error="_onError">
+            </iron-ajax>
+
+            <iron-ajax
                 id="saveAjax"
                 method="post"
                 url="[[actionUrl]]"
@@ -165,11 +172,9 @@ class QuestionForm extends PolymerElement {
 
             <paper-dialog id="context_menu" on-iron-overlay-closed="_dismissContextMenu" hidden>
                 <paper-radio-group id="label_group" allow-empty-selection>
-                    <paper-radio-button on-change="_onRadioChange" name="treatment" value="bg_mark_blue">Treatment</paper-radio-button>
-                    <paper-radio-button on-change="_onRadioChange" name="disease" value="bg_mark_orange">Disease</paper-radio-button>
-                    <paper-radio-button on-change="_onRadioChange" name="symtomps" value="bg_mark_red">Symtomps</paper-radio-button>
-                    <paper-radio-button on-change="_onRadioChange" name="gender" value="bg_mark_green">Gender</paper-radio-button>
-                    <paper-radio-button on-change="_onRadioChange" name="interval" value="bg_mark_black">Interval</paper-radio-button>
+                <template is="dom-repeat" items="{{labels}}">
+                    <paper-radio-button on-change="_onRadioChange" name="{{item.value}}" value="{{item.css}}">{{item.name}}</paper-radio-button>
+                </template>
                 </paper-radio-group>
             </paper-dialog>
         `;
@@ -181,6 +186,12 @@ class QuestionForm extends PolymerElement {
             actionUrl: {
                 type: String,
                 value: ''
+            },
+            labels: {
+                type: Array,
+                value: function() {
+                    return [];
+                }
             },
             question: {
                 type: Object,
@@ -229,6 +240,26 @@ class QuestionForm extends PolymerElement {
 
         // register contextmenu event on component level
         this.addEventListener('contextmenu', this._onContextMenu);
+
+        this.$.dataAjax.url = '/admin/tags';
+        this.$.dataAjax.generateRequest();
+    }
+
+    _onResponse(data) {
+        var response = data.detail.response;
+        this.count = response.count;
+        this.splice('labels', 0, this.labels.length); // clear data
+        response.results.forEach(function(item) {
+            this.push('labels', item);
+        }, this);
+    }
+
+    _onError() {
+        this._error = 'Something wrong... Please try again.';
+        self = this;
+        setTimeout(function(){
+            self.dispatchEvent(new CustomEvent('cancel', {bubbles: true, composed: true}));
+        }, 2000);
     }
 
     _onContextMenu(e) {
@@ -378,7 +409,6 @@ class QuestionForm extends PolymerElement {
             this.$.context_menu.hidden = true;
             this.$.context_menu.close();
         }
-        console.log(this.registry);
     }
 
     _clearData() {

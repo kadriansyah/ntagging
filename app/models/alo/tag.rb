@@ -9,7 +9,6 @@ class Alo::Tag
     paginates_per 20
 	
     field :name, type: String, default: ''
-	
-    field :description, type: String, default: ''
-	
+    field :value, type: String, default: ''
+    field :css, type: String, default: ''
 end

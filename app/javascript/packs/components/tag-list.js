@@ -84,9 +84,14 @@ class TagList extends PolymerElement {
                         <template>[[item.name]]</template>
                     </vaadin-grid-column>
                     
-                    <vaadin-grid-column width="40%" flex-grow="0">
-                        <template class="header">Description</template>
-                        <template>[[item.description]]</template>
+                    <vaadin-grid-column width="20%" flex-grow="0">
+                        <template class="header">Value</template>
+                        <template>[[item.value]]</template>
+                    </vaadin-grid-column>
+
+                    <vaadin-grid-column width="20%" flex-grow="0">
+                        <template class="header">CSS</template>
+                        <template>[[item.css]]</template>
                     </vaadin-grid-column>
                     
                     <vaadin-grid-column width="20%" flex-grow="0">

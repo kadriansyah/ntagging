@@ -4,7 +4,7 @@ class Alo::TagController < ApplicationController
     include MoslemCorners::INJECT['tag_service']
 
     # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
-    wrap_parameters :tag, include: [:id, :name, :description]
+    wrap_parameters :tag, include: [:id, :name, :value, :css]
 
     def index
         tags, page_count = tag_service.find_tags(params[:page])
@@ -75,7 +75,7 @@ class Alo::TagController < ApplicationController
 
     # Using strong parameters
     def tag_form_params
-        params.require(:tag).permit(:id, :name, :description)
+        params.require(:tag).permit(:id, :name, :value, :css)
         # params.require(:core_user).permit! # allow all
     end
 end

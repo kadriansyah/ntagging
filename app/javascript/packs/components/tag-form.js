@@ -117,9 +117,16 @@ class TagForm extends PolymerElement {
                 </paper-input-container>
                 
                 <paper-input-container>
-                    <label slot="label">Description</label>
-                    <iron-input slot="input" bind-value="{{tag.description}}">
-                        <input id="description" type="text" value="{{tag.description}}">
+                    <label slot="label">Value</label>
+                    <iron-input slot="input" bind-value="{{tag.value}}">
+                        <input id="value" type="text" value="{{tag.value}}">
+                    </iron-input>
+                </paper-input-container>
+
+                <paper-input-container>
+                    <label slot="label">CSS</label>
+                    <iron-input slot="input" bind-value="{{tag.css}}">
+                        <input id="css" type="text" value="{{tag.css}}">
                     </iron-input>
                 </paper-input-container>
                 
