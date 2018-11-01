@@ -4,7 +4,7 @@ class Alo::QuestionController < ApplicationController
     include MoslemCorners::INJECT['question_service']
 
     # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
-    wrap_parameters :question, include: [:id, :title, :question_text, :question_tag]
+    wrap_parameters :question, include: [:id, :title, :question_text, :question_tag, :question_label]
 
     def index
         questions, page_count = question_service.find_questions(params[:page])
@@ -75,7 +75,7 @@ class Alo::QuestionController < ApplicationController
 
     # Using strong parameters
     def question_form_params
-        params.require(:question).permit(:id, :title, :question_text, :question_tag)
+        params.require(:question).permit(:id, :title, :question_text, :question_tag, :question_label)
         # params.require(:core_user).permit! # allow all
     end
 end

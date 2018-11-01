@@ -155,7 +155,7 @@ class QuestionForm extends PolymerElement {
                     </div>
                 </div>
                 
-                <div id="label_container"></div>
+                <div id="label_container">{{question.question_label}}</div>
 
                 <div class="wrapper-btns">
                     <paper-button class="link" on-tap="_cancel">Cancel</paper-button>
@@ -200,6 +200,7 @@ class QuestionForm extends PolymerElement {
                 value: 'new'
             },
             exclude: Object,
+            registry: Object,
             countLabel: Object,
             selectedText: String,
             parentTextNode: Object,
@@ -214,6 +215,7 @@ class QuestionForm extends PolymerElement {
     ready() {
         super.ready();
         this.exclude = {};
+        this.registry = {};
         this.countLabel = {};
     }
 
@@ -251,10 +253,40 @@ class QuestionForm extends PolymerElement {
         this.$.context_menu.open();
     }
 
+    _isSuperset(text) {
+        const keys = Object.keys(this.registry);
+        for(var i in keys) {
+            if (text.includes(keys[i]) && this.registry[keys[i]] > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    _addRegistry(keyword, count) {
+        if (this.registry[keyword] == null) {
+            this.registry[keyword] = count;
+        }
+        else {
+            this.registry[keyword] = this.registry[keyword] + count;
+        }
+    }
+
+    _subRegistry(keyword, count) {
+        this.registry[keyword] = this.registry[keyword] - count;
+    }
+
     _onRadioChange(e) {
         self = this;
         if (e.target.checked == true) {
             if (this.parentTextNode.nodeName.toLowerCase() == 'p') {
+                // disallow marking from subset to superset
+                if (this._isSuperset(this.selectedText)) {
+                    this.$.context_menu.hidden = true;
+                    this.$.context_menu.close();
+                    return;
+                }
+
                 var options = {};
                 options['element'] = e.target.name;
                 options['separateWordSearch'] = false;
@@ -266,6 +298,7 @@ class QuestionForm extends PolymerElement {
                 }
 
                 options['done'] = function(counter) {
+                    self._addRegistry(self.selectedText, counter);
                     var span = self.shadowRoot.getElementById(e.target.name);
                     if (span == null) {
                         var span = document.createElement('span');
@@ -299,9 +332,9 @@ class QuestionForm extends PolymerElement {
             else {
                 var spanId = this.parentTextNode.nodeName.toLowerCase();
 
-                // umark only if selectedText is not part of tagged text
-                console.log(this.parentTextNode.textContent);
-                if (!this.parentTextNode.textContent.includes(this.selectedText)) {
+                // do not umark if selectedText is part of tagged text
+                var keyword = this.parentTextNode.textContent;
+                if (this.parentTextNode.textContent.includes(this.selectedText) && this.parentTextNode.textContent.length == this.selectedText.length) {
                     var mark_instance = new Mark(this.parentTextNode);
                     mark_instance.unmark(this.selectedText);
                 }
@@ -320,8 +353,12 @@ class QuestionForm extends PolymerElement {
                 if (this.exclude[this.selectedText] != null) {
                     options['exclude'] = Array.from(this.exclude[this.selectedText]);
                 }
-                
+
                 options['done'] = function(counter) {
+                    // make sure we are not incrementing the same keyword twice (condition: replace the same keyword with different label)
+                    if (self.selectedText != keyword) {
+                        self._addRegistry(self.selectedText, counter);
+                    }
                     var span = self.shadowRoot.getElementById(e.target.name);
                     if (span == null) {
                         var span = document.createElement('span');
@@ -354,6 +391,8 @@ class QuestionForm extends PolymerElement {
             }
         }
         else {
+            this._subRegistry(this.selectedText, 1);
+
             var mark_instance = new Mark(this.parentTextNode);
             mark_instance.unmark(this.selectedText, options);
 
@@ -365,6 +404,7 @@ class QuestionForm extends PolymerElement {
             this.$.context_menu.hidden = true;
             this.$.context_menu.close();
         }
+        // console.log(this.registry);
     }
 
     _clearLabel() {
@@ -396,7 +436,6 @@ class QuestionForm extends PolymerElement {
         if (this._mode === 'copy') {
             this.question.id = ''; // nullify id, we will save it as new document
         }
-        this.dispatchEvent(new CustomEvent('editSuccess', {bubbles: true, composed: true}));
 
         if (this.question.question_tag.length === 0 || !this.question.question_tag) {
             this.$.tagged.innerHTML = this.question.question_text;
@@ -404,6 +443,12 @@ class QuestionForm extends PolymerElement {
         else {
             this.$.tagged.innerHTML = this.question.question_tag;
         }
+
+        if (this.question.question_label.length > 0 && this.question.question_label) {
+            this.$.label_container.innerHTML = this.question.question_label;
+        }
+
+        this.dispatchEvent(new CustomEvent('editSuccess', {bubbles: true, composed: true}));
     }
 
     _onEditError() {
@@ -449,8 +494,10 @@ class QuestionForm extends PolymerElement {
     }
 
     _save() {
-        this._clearLabel();
         this.question.question_tag = this.$.tagged.innerHTML;
+        this.question.question_label = this.$.label_container.innerHTML;
+        this._clearLabel();
+
         if (this._mode === 'new' || this._mode === 'copy') {
             this.$.saveAjax.headers['X-CSRF-Token'] = this.formAuthenticityToken;
             this.$.saveAjax.body = this.question;
@@ -467,10 +514,10 @@ class QuestionForm extends PolymerElement {
     }
 
     _cancel() {
-        this._clearLabel();
         this._error = '';
         this._mode = 'new';
         this.question = {};
+        this._clearLabel();
         this.dispatchEvent(new CustomEvent('cancel', {bubbles: true, composed: true}));
     }
 }
