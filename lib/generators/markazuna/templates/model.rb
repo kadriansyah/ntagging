@@ -15,11 +15,10 @@ class <%= generated_class_name %>
     paginates_per 10
 	<%
 	@fields.each_with_index do |field, index|
-		if index > 0
-	%>
+        next if index == 0
+    %>
     field :<%= field %>, type: String, default: ''
 	<%
-		end
 	end
 	%>
 end

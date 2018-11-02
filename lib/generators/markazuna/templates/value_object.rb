@@ -23,11 +23,10 @@ class <%= generated_class_name %>Form
     # Validations
     <%
     @fields.each_with_index do |field, index|
-        if index > 0
+        next if index == 0
     %>
     validates :<%= field %>, presence: true
     <%
-        end
     end
     %>
 
