@@ -308,7 +308,7 @@ class QuestionForm extends PolymerElement {
         }
         else {
             var count = this.labelCount[label] + counter;
-            var span = this.shadowRoot.getElementById(label);
+            var span  = this.shadowRoot.getElementById(label);
             span.textContent = `${label} (${count})`;
             this.labelCount[label] = count;
         }
@@ -456,15 +456,17 @@ class QuestionForm extends PolymerElement {
         }
 
         // load metadata
-        var metadata = this.question.metadata.split('-');
-        function Array_toSet(key, value) {
-            if (typeof value === 'object' && value instanceof Array) {
-                return new Set(value);
+        if (this.question.metadata.length > 0 && this.question.metadata) {
+            var metadata = this.question.metadata.split('-');
+            function Array_toSet(key, value) {
+                if (typeof value === 'object' && value instanceof Array) {
+                    return new Set(value);
+                }
+                return value;
             }
-            return value;
+            this.exclude = JSON.parse(metadata[0], Array_toSet);
+            this.labelCount = JSON.parse(metadata[1]);
         }
-        this.exclude = JSON.parse(metadata[0], Array_toSet);
-        this.labelCount = JSON.parse(metadata[1]);
 
         this.dispatchEvent(new CustomEvent('editSuccess', {bubbles: true, composed: true}));
     }
