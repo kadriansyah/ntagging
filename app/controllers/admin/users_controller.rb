@@ -1,16 +1,17 @@
 require_dependency 'moslemcorners/di_container'
 
-class Alo::TagController < ApplicationController
-    include MoslemCorners::INJECT['tag_service']
+class Admin::UsersController < ApplicationController
+    include MoslemCorners::INJECT['admin_service']
+    before_action :authenticate_core_user!
 
     # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
-    wrap_parameters :tag, include: [:id, :name, :value, :css]
+    wrap_parameters :core_user, include: [:id, :email, :username, :password, :confirmation_password, :firstname, :lastname]
 
     def index
-        tags, page_count = tag_service.find_tags(params[:page])
-        if (tags.size > 0)
+        core_users, page_count = admin_service.find_users(params[:page])
+        if (core_users.size > 0)
             respond_to do |format|
-                format.json { render :json => { results: tags, count: page_count }}
+                format.json { render :json => { results: core_users, count: page_count }}
             end
         else
             render :json => { results: []}
@@ -18,7 +19,7 @@ class Alo::TagController < ApplicationController
     end
 
     def delete
-        status, page_count = tag_service.delete_tag(params[:id])
+        status, page_count = admin_service.delete_user(params[:id])
         if status
             respond_to do |format|
                 format.json { render :json => { status: "200", count: page_count } }
@@ -31,8 +32,8 @@ class Alo::TagController < ApplicationController
     end
 
     def create
-        tag_form = Alo::TagForm.new(tag_form_params)
-        if tag_service.create_tag(tag_form)
+        user_form = Admin::UserForm.new(user_form_params)
+        if admin_service.create_user(user_form)
             respond_to do |format|
                 format.json { render :json => { status: "200", message: "Success" } }
             end
@@ -45,11 +46,13 @@ class Alo::TagController < ApplicationController
 
     def edit
         id = params[:id]
-        tag = tag_service.find_tag(id)
+        core_user = admin_service.find_user(id)
 
-        if tag
+        # # change id as string not oid
+        # core_user = core_user.as_json(:except => :_id).merge('id' => core_user.id.to_s)
+        if core_user
             respond_to do |format|
-                format.json { render :json => { status: "200", payload: tag } }
+                format.json { render :json => { status: "200", payload: core_user } }
             end
         else
             respond_to do |format|
@@ -59,8 +62,8 @@ class Alo::TagController < ApplicationController
     end
 
     def update
-        tag_form = Alo::TagForm.new(tag_form_params)
-        if tag_service.update_tag(tag_form)
+        user_form = Admin::UserForm.new(user_form_params)
+        if admin_service.update_user(user_form)
             respond_to do |format|
                 format.json { render :json => { status: "200", message: "Success" } }
             end
@@ -74,8 +77,8 @@ class Alo::TagController < ApplicationController
     private
 
     # Using strong parameters
-    def tag_form_params
-        params.require(:tag).permit(:id, :name, :value, :css)
+    def user_form_params
+        params.require(:core_user).permit(:id, :email, :username, :password, :confirmation_password, :firstname, :lastname)
         # params.require(:core_user).permit! # allow all
     end
 end

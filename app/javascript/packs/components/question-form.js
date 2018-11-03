@@ -1,5 +1,6 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/iron-icon/iron-icon.js';
+import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-input/paper-input-container.js';
 import '@polymer/paper-card/paper-card.js';
@@ -177,6 +178,12 @@ class QuestionForm extends PolymerElement {
                 </template>
                 </paper-radio-group>
             </paper-dialog>
+            <paper-dialog class="card" id="error" modal>
+                <div class="title"><iron-icon icon="icons:error"></iron-icon>{{_error}}</div>
+                <div class="buttons">
+                    <paper-button dialog-dismiss>Ok</paper-button>
+                </div>
+            </paper-dialog>
         `;
     }
 
@@ -215,7 +222,10 @@ class QuestionForm extends PolymerElement {
             labelCount: Object,
             selectedText: String,
             parentTextNode: Object,
-            _error: String
+            _error: {
+                type: String,
+                value: ''
+            }
         };
     }
 
@@ -254,8 +264,9 @@ class QuestionForm extends PolymerElement {
         }, this);
     }
 
-    _onError() {
-        this._error = 'Something wrong... Please try again.';
+    _onError(event) {
+        var response = event.detail.request.xhr.response;
+        this._error = response.message;
         self = this;
         setTimeout(function(){
             self.dispatchEvent(new CustomEvent('cancel', {bubbles: true, composed: true}));

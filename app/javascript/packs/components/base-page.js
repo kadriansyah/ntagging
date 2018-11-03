@@ -147,6 +147,9 @@ export class BasePage extends PolymerElement {
                             <a class="app-menu-item" on-tap="_openUrl" id="users">Users</a>
                         </app-menu>
                     </app-submenu>
+                    <a class="app-menu-item">
+                        <app-menu-icon-item icon="icons:chrome-reader-mode" on-tap="_logout" id="logout">Logout</app-menu-icon-item>
+                    </a>
                 </app-menu>
             </app-drawer>
         `;
@@ -207,6 +210,12 @@ export class BasePage extends PolymerElement {
 
     _openUrl(e) {
         this.$.location.path = this.$.location.path +'/page/'+ e.target.id;
+        window.location.reload(true);
+    }
+
+    _logout() {
+        var path = this.$.location.path.split('/');
+        this.$.location.path = `${path[0]}/admin/logout`;
         window.location.reload(true);
     }
 }

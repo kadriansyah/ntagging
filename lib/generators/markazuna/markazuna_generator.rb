@@ -8,9 +8,9 @@ class MarkazunaGenerator < Rails::Generators::NamedBase
 		@service_name = options['service_name']
 		@fields = options['fields']
 		if class_path[0].nil?
-			template "controller.rb", File.join("app/controllers", "#{file_name}_controller.rb")
+			template "controller.rb", File.join("app/controllers", "#{plural_file_name}_controller.rb")
 		else
-			template "controller.rb", File.join("app/controllers/#{class_path[0]}", "#{file_name}_controller.rb")
+			template "controller.rb", File.join("app/controllers/#{class_path[0]}", "#{plural_file_name}_controller.rb")
 		end
 	end
 
@@ -67,14 +67,14 @@ class MarkazunaGenerator < Rails::Generators::NamedBase
 		# routes
 		if class_path[0].nil?
 			insert_into_file 'config/routes.rb', before: /end\Z/ do <<-RUBY
-	resources :#{plural_name}, controller: '#{singular_name}' do
+	resources :#{plural_name}, controller: '#{plural_name}' do
 		get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
 	end
 			RUBY
 			end
 		else
 			insert_into_file 'config/routes.rb', before: /end\Z/ do <<-RUBY
-	resources :#{plural_name}, controller: '#{class_path[0]}/#{singular_name}' do
+	resources :#{plural_name}, controller: '#{class_path[0]}/#{plural_name}' do
 		get 'delete', on: :member # http://guides.rubyonrails.org/routing.html#adding-more-restful-actions
 	end
 		RUBY

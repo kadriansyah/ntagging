@@ -1,17 +1,15 @@
 class CustomFailure < Devise::FailureApp
-    def redirect_url
-        if @scope_class == Admin::CoreUser
-            '/admin/login'
+    def respond
+        if request.format == :json
+            json_error_response
         else
-            '/auth/login' # Admin::CoreAccount
+            super
         end
     end
 
-    def respond
-        if http_auth?
-            http_auth
-        else
-            redirect
-        end
+    def json_error_response
+        self.status = 401
+        self.content_type = 'application/json'
+        self.response_body = { status: '401', message: i18n_message }.to_json
     end
 end

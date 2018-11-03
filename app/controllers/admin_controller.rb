@@ -1,7 +1,7 @@
 require_dependency 'moslemcorners/di_container'
 
 class AdminController < ApplicationController
-    before_action :authenticate_core_user!, except: [:index, :page]
+    before_action :authenticate_core_user!
 
     def index
 

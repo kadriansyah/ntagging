@@ -1,28 +1,17 @@
 require_dependency 'moslemcorners/di_container'
-<%
-    fields = ""
-    for ii in 0..@fields.length-2 do
-        fields = "#{fields}:#{@fields[ii]}, "
-    end
-    fields = "#{fields}:#{@fields[@fields.length-1]}"
-    if namespaced?
-        generated_class_name = "#{namespace.capitalize}::#{plural_name.capitalize}"
-    else
-        generated_class_name = "#{plural_name.capitalize}"
-    end
-%>
-class <%= generated_class_name %>Controller < ApplicationController
-    include MoslemCorners::INJECT['<%= @service_name %>']
+
+class Alo::QuestionsController < ApplicationController
+    include MoslemCorners::INJECT['question_service']
     before_action :authenticate_core_user!
 
     # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
-    wrap_parameters :<%= singular_name %>, include: [<%= fields %>]
+    wrap_parameters :question, include: [:id, :title, :question_text, :question_tag, :question_label, :metadata]
 
     def index
-        <%= plural_name %>, page_count = <%= @service_name %>.find_<%= plural_name %>(params[:page])
-        if (<%= plural_name %>.size > 0)
+        questions, page_count = question_service.find_questions(params[:page])
+        if (questions.size > 0)
             respond_to do |format|
-                format.json { render :json => { results: <%= plural_name %>, count: page_count }}
+                format.json { render :json => { results: questions, count: page_count }}
             end
         else
             render :json => { results: []}
@@ -30,7 +19,7 @@ class <%= generated_class_name %>Controller < ApplicationController
     end
 
     def delete
-        status, page_count = <%= @service_name %>.delete_<%= singular_name %>(params[:id])
+        status, page_count = question_service.delete_question(params[:id])
         if status
             respond_to do |format|
                 format.json { render :json => { status: "200", count: page_count } }
@@ -43,8 +32,8 @@ class <%= generated_class_name %>Controller < ApplicationController
     end
 
     def create
-        <%= singular_name %>_form = <%= generated_class_name %>Form.new(<%= singular_name %>_form_params)
-        if <%= @service_name %>.create_<%= singular_name %>(<%= singular_name %>_form)
+        question_form = Alo::QuestionForm.new(question_form_params)
+        if question_service.create_question(question_form)
             respond_to do |format|
                 format.json { render :json => { status: "200", message: "Success" } }
             end
@@ -57,11 +46,11 @@ class <%= generated_class_name %>Controller < ApplicationController
 
     def edit
         id = params[:id]
-        <%= singular_name %> = <%= @service_name %>.find_<%= singular_name %>(id)
+        question = question_service.find_question(id)
 
-        if <%= singular_name %>
+        if question
             respond_to do |format|
-                format.json { render :json => { status: "200", payload: <%= singular_name %> } }
+                format.json { render :json => { status: "200", payload: question } }
             end
         else
             respond_to do |format|
@@ -71,8 +60,8 @@ class <%= generated_class_name %>Controller < ApplicationController
     end
 
     def update
-        <%= singular_name %>_form = <%= generated_class_name %>Form.new(<%= singular_name %>_form_params)
-        if <%= @service_name %>.update_<%= singular_name %>(<%= singular_name %>_form)
+        question_form = Alo::QuestionForm.new(question_form_params)
+        if question_service.update_question(question_form)
             respond_to do |format|
                 format.json { render :json => { status: "200", message: "Success" } }
             end
@@ -86,8 +75,8 @@ class <%= generated_class_name %>Controller < ApplicationController
     private
 
     # Using strong parameters
-    def <%= singular_name %>_form_params
-        params.require(:<%= singular_name %>).permit(<%= fields %>)
+    def question_form_params
+        params.require(:question).permit(:id, :title, :question_text, :question_tag, :question_label, :metadata)
         # params.require(:core_user).permit! # allow all
     end
 end
