@@ -423,6 +423,10 @@ class QuestionForm extends PolymerElement {
     }
 
     _clearData() {
+        var tagged = this.shadowRoot.getElementById('tagged');
+        while (tagged.firstChild) {
+            tagged.removeChild(tagged.firstChild);
+        }
         var label_container = this.shadowRoot.getElementById('label_container');
         while (label_container.firstChild) {
             label_container.removeChild(label_container.firstChild);
