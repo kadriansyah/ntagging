@@ -1,4 +1,3 @@
-
 # add default user
 core_user = Admin::CoreUser.new
 core_user.email = 'admin@gmail.com'
