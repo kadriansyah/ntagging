@@ -5,13 +5,8 @@ require_dependency 'markazuna/di_container'
         fields = "#{fields}:#{@fields[ii]}, "
     end
     fields = "#{fields}:#{@fields[@fields.length-1]}"
-    if namespaced?
-        generated_class_name = "#{namespace.capitalize}::#{plural_name.capitalize}"
-    else
-        generated_class_name = "#{plural_name.capitalize}"
-    end
 %>
-class <%= generated_class_name %>Controller < ApplicationController
+class <%= @class_name %>Controller < ApplicationController
     include Markazuna::INJECT['<%= @service_name %>']
 
     # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
@@ -42,7 +37,7 @@ class <%= generated_class_name %>Controller < ApplicationController
     end
 
     def create
-        <%= singular_name %>_form = <%= generated_class_name %>Form.new(<%= singular_name %>_form_params)
+        <%= singular_name %>_form = <%= class_name %>Form.new(<%= singular_name %>_form_params)
         if <%= @service_name %>.create_<%= singular_name %>(<%= singular_name %>_form)
             respond_to do |format|
                 format.json { render :json => { status: "200", message: "Success" } }
@@ -70,7 +65,7 @@ class <%= generated_class_name %>Controller < ApplicationController
     end
 
     def update
-        <%= singular_name %>_form = <%= generated_class_name %>Form.new(<%= singular_name %>_form_params)
+        <%= singular_name %>_form = <%= class_name %>Form.new(<%= singular_name %>_form_params)
         if <%= @service_name %>.update_<%= singular_name %>(<%= singular_name %>_form)
             respond_to do |format|
                 format.json { render :json => { status: "200", message: "Success" } }

@@ -9,13 +9,8 @@
         fields_self = "#{fields_self}#{@fields[ii]}: self.#{@fields[ii]}, "
     end
     fields_self = "#{fields_self}#{@fields[@fields.length-1]}: self.#{@fields[@fields.length-1]}"
-    if namespaced?
-        generated_class_name = "#{namespace.capitalize}::#{class_name}"
-    else
-        generated_class_name = "#{class_name}"
-    end
 %>
-class <%= generated_class_name %>Form
+class <%= class_name %>Form
     include ActiveModel::Model
 
     attr_accessor(<%= fields %>)
@@ -32,7 +27,7 @@ class <%= generated_class_name %>Form
 
     def save
         if valid?
-            <%= singular_name %> = <%= generated_class_name %>.new(<%= fields_self %>)
+            <%= singular_name %> = <%= class_name %>.new(<%= fields_self %>)
             <%= singular_name %>.save
             true
         else
@@ -42,7 +37,7 @@ class <%= generated_class_name %>Form
 
     def update
         if valid?
-            <%= singular_name %> = <%= generated_class_name %>.find(self.id)
+            <%= singular_name %> = <%= class_name %>.find(self.id)
             <%= singular_name %>.update_attributes!(<%= fields_self %>)
             true
         else

@@ -7,6 +7,4 @@ import '@webcomponents/webcomponentsjs/webcomponents-loader.js'
 /*---------------------------------------------------------------------
   Import Components
 ----------------------------------------------------------------------*/
-import './components/tags-page.js'
-import './components/tag-list.js'
-import './components/tag-form.js'
+import './admin-page.js'

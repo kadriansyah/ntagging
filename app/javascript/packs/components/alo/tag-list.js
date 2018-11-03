@@ -1,23 +1,28 @@
 import { html } from '@polymer/polymer/polymer-element.js';
-import { BaseList } from './base-list.js'
+import { BaseList } from '../base-list.js'
 
-import './markazuna/markazuna-circular-pager.js';
-import './question-form.js';
+import '../markazuna/markazuna-circular-pager.js';
+import './tag-form.js';
 
-class QuestionList extends BaseList {
+class TagList extends BaseList {
     static get listTemplate() { 
         return html`
             <div class="flex grid-container" width="100%">
-                <vaadin-grid theme="row-stripes" aria-label="Questions" items="[[data]]">
-                    
+                <vaadin-grid theme="row-stripes" aria-label="Tags" items="[[data]]">
+                
                     <vaadin-grid-column width="40%" flex-grow="0">
-                        <template class="header">Title</template>
-                        <template>[[item.title]]</template>
+                        <template class="header">Name</template>
+                        <template>[[item.name]]</template>
                     </vaadin-grid-column>
                     
-                    <vaadin-grid-column width="40%" flex-grow="0">
-                        <template class="header">Question</template>
-                        <template>[[item.question_text]]</template>
+                    <vaadin-grid-column width="20%" flex-grow="0">
+                        <template class="header">Value</template>
+                        <template>[[item.value]]</template>
+                    </vaadin-grid-column>
+
+                    <vaadin-grid-column width="20%" flex-grow="0">
+                        <template class="header">CSS</template>
+                        <template>[[item.css]]</template>
                     </vaadin-grid-column>
                     
                     <vaadin-grid-column width="20%" flex-grow="0">
@@ -33,14 +38,14 @@ class QuestionList extends BaseList {
                 </vaadin-grid>
             </div>
             <div class="flex" width="100%">
-                <markazuna-circular-pager page="[[page]]" count="[[count]]" range="10" url="/admin/questions?page=#{page}"></markazuna-circular-pager>
+                <markazuna-circular-pager page="[[page]]" count="[[count]]" range="10" url="/admin/tags?page=#{page}"></markazuna-circular-pager>
             </div>
         `;
     }
 
     static get formTemplate() { 
         return html`
-            <question-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="formData"></question-form>
+            <tag-form action-url="[[dataUrl]]" form-authenticity-token="[[formAuthenticityToken]]" id="formData"></tag-form>
         `;
     }
 
@@ -53,15 +58,15 @@ class QuestionList extends BaseList {
     }
 
     _formTitleNew() {
-        return 'Create New Question';
+        return 'Create New Tag';
     }
 
     _formTitleEdit() {
-        return 'Edit Question';
+        return 'Edit Tag';
     }
 
     _formTitleCopy() {
-        return 'Copy Question';
+        return 'Copy Tag';
     }
 }
-customElements.define('question-list', QuestionList);
+customElements.define('tag-list', TagList);

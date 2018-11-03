@@ -7,7 +7,7 @@ import '@polymer/iron-ajax/iron-ajax.js';
 import '@polymer/iron-input/iron-input.js';
 import '@polymer/paper-progress/paper-progress.js';
 
-import './markazuna/markazuna-shared-styles.js';
+import '../markazuna/markazuna-shared-styles.js';
 
 class <%= singular_name.capitalize %>Form extends PolymerElement {
     static get template() {

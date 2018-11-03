@@ -1,5 +1,5 @@
 import { html } from '@polymer/polymer/polymer-element.js';
-import { BasePage } from './base-page.js'
+import { BasePage } from '../base-page.js'
 import './question-list.js';
 
 class QuestionsPage extends BasePage {

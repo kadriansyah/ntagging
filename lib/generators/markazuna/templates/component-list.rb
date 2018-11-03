@@ -1,7 +1,7 @@
 import { html } from '@polymer/polymer/polymer-element.js';
-import { BaseList } from './base-list.js'
+import { BaseList } from '../base-list.js'
 
-import './markazuna/markazuna-circular-pager.js';
+import '../markazuna/markazuna-circular-pager.js';
 import './<%= singular_name %>-form.js';
 
 class <%= singular_name.capitalize %>List extends BaseList {
@@ -54,15 +54,15 @@ class <%= singular_name.capitalize %>List extends BaseList {
     }
 
     _formTitleNew() {
-        return 'Create New #{<%= singular_name.capitalize %>}';
+        return 'Create New <%= singular_name.capitalize %>';
     }
 
     _formTitleEdit() {
-        return 'Edit #{<%= singular_name.capitalize %>';
+        return 'Edit <%= singular_name.capitalize %>';
     }
 
     _formTitleCopy() {
-        return 'Copy #{<%= singular_name.capitalize %>';
+        return 'Copy <%= singular_name.capitalize %>';
     }
 }
 customElements.define('<%= singular_name %>-list', <%= singular_name.capitalize %>List);

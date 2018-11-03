@@ -7,6 +7,4 @@ import '@webcomponents/webcomponentsjs/webcomponents-loader.js'
 /*---------------------------------------------------------------------
   Import Components
 ----------------------------------------------------------------------*/
-import './components/questions-page.js'
-import './components/question-list.js'
-import './components/question-form.js'
+import './login-form.js'

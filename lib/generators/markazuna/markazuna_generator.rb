@@ -8,8 +8,10 @@ class MarkazunaGenerator < Rails::Generators::NamedBase
 		@service_name = options['service_name']
 		@fields = options['fields']
 		if class_path[0].nil?
+			@class_name = (class_path + [plural_name]).map!(&:camelize).join("::")
 			template "controller.rb", File.join("app/controllers", "#{plural_file_name}_controller.rb")
 		else
+			@class_name = (class_path + [plural_name]).map!(&:camelize).join("::")
 			template "controller.rb", File.join("app/controllers/#{class_path[0]}", "#{plural_file_name}_controller.rb")
 		end
 	end
@@ -50,14 +52,20 @@ class MarkazunaGenerator < Rails::Generators::NamedBase
 
 		if class_path[0].nil?
 			@url = "/#{plural_name}"
+			@component_path = "components"
+			template "component-page.rb", File.join("app/javascript/packs/components", "#{plural_name}-page.js")
+			template "component-form.rb", File.join("app/javascript/packs/components", "#{singular_name}-form.js")
+			template "component-list.rb", File.join("app/javascript/packs/components", "#{singular_name}-list.js")
+			template "component.rb", File.join("app/javascript/packs/components", "#{plural_name}.js")
 		else
 			@url = "/#{class_path[0]}/#{plural_name}"
+			@component_path = "components/#{class_path[0]}"
+			template "component-page.rb", File.join("app/javascript/packs/components/#{class_path[0]}", "#{plural_name}-page.js")
+			template "component-form.rb", File.join("app/javascript/packs/components/#{class_path[0]}", "#{singular_name}-form.js")
+			template "component-list.rb", File.join("app/javascript/packs/components/#{class_path[0]}", "#{singular_name}-list.js")
+			template "component.rb", File.join("app/javascript/packs/components/#{class_path[0]}", "#{plural_name}.js")
 		end
 
-		template "component.rb", File.join("app/javascript/packs", "#{plural_name}.js")
-		template "component-page.rb", File.join("app/javascript/packs/components", "#{plural_name}-page.js")
-		template "component-form.rb", File.join("app/javascript/packs/components", "#{singular_name}-form.js")
-		template "component-list.rb", File.join("app/javascript/packs/components", "#{singular_name}-list.js")
 		if class_path[0].nil?
 			template "component-html.rb", File.join("app/views", "#{plural_name}.html.erb")
 		else
@@ -83,7 +91,7 @@ class MarkazunaGenerator < Rails::Generators::NamedBase
 
 		# DI Container
 		if class_path[0].nil?
-			insert_into_file 'lib/moslemcorners/di_container.rb', after: "extend Dry::Container::Mixin\n" do <<-RUBY
+			insert_into_file 'lib/markazuna/di_container.rb', after: "extend Dry::Container::Mixin\n" do <<-RUBY
 
 		register '#{singular_name}_service' do
 			#{singular_name.capitalize}Service.new
@@ -91,7 +99,7 @@ class MarkazunaGenerator < Rails::Generators::NamedBase
 		RUBY
 			end
 		else
-			insert_into_file 'lib/moslemcorners/di_container.rb', after: "extend Dry::Container::Mixin\n" do <<-RUBY
+			insert_into_file 'lib/markazuna/di_container.rb', after: "extend Dry::Container::Mixin\n" do <<-RUBY
 
 		register '#{singular_name}_service' do
 			#{class_path[0].capitalize}::#{singular_name.capitalize}Service.new

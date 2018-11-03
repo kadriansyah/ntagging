@@ -1,5 +1,5 @@
 import { html } from '@polymer/polymer/polymer-element.js';
-import { BasePage } from './base-page.js'
+import { BasePage } from '../base-page.js'
 import './tag-list.js';
 
 class TagsPage extends BasePage {
