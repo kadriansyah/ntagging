@@ -1,5 +1,4 @@
-import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
-
+import { html } from '@polymer/polymer/polymer-element.js';
 import { BasePage } from '../base-page.js'
 
 class GroupsPage extends BasePage {

@@ -1,7 +1,6 @@
-require_dependency 'moslemcorners/di_container'
+require_dependency 'markazuna/di_container'
 
 class AdminController < ApplicationController
-    before_action :authenticate_core_user!
 
     def index
 

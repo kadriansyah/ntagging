@@ -14,8 +14,8 @@ import 'app-menu-polymer3/app-menu.js'
 import 'app-menu-polymer3/app-submenu.js'
 import 'app-menu-polymer3/app-menu-icon-item.js'
 
-import './moslemcorner/moslemcorner-shared-styles.js';
-import './moslemcorner/moslemcorner-search-bar.js';
+import './markazuna/markazuna-shared-styles.js';
+import './markazuna/markazuna-search-bar.js';
 
 export class BasePage extends PolymerElement {
     static get template() {
@@ -123,7 +123,7 @@ export class BasePage extends PolymerElement {
                     <paper-icon-button icon="menu" on-click="_toggleDrawer"></paper-icon-button>
                     <div class="flex-horizontal" style="width: 100%;">
                         <div class="flexchild title">[[title]]</div>
-                        <div class="search"><moslemcorner-search-bar/></div>
+                        <div class="search"><markazuna-search-bar/></div>
                     </div>
                 </app-toolbar>
             </app-header>

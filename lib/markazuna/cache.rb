@@ -2,7 +2,7 @@ require 'redis'
 require 'redis-namespace'
 require 'singleton'
 
-module MoslemCorners
+module Markazuna
     class Cache
         include Singleton # mixin the singleton module
 

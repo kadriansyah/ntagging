@@ -11,7 +11,7 @@ import '@polymer/paper-radio-button/paper-radio-button.js';
 import '@polymer/paper-radio-group/paper-radio-group.js';
 
 import Mark from 'mark.js/dist/mark.es6.js'
-import './moslemcorner/moslemcorner-shared-styles.js';
+import './markazuna/markazuna-shared-styles.js';
 
 class QuestionForm extends PolymerElement {
     static get template() {

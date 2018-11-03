@@ -3,7 +3,7 @@ import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/iron-input/iron-input.js';
 import '@polymer/paper-input/paper-input.js';
 
-class MoslemcornerSearchBar extends PolymerElement {
+class MarkazunaSearchBar extends PolymerElement {
     static get template() {
         return html`
             <style>
@@ -96,4 +96,4 @@ class MoslemcornerSearchBar extends PolymerElement {
         }
     }
 }
-customElements.define('moslemcorner-search-bar', MoslemcornerSearchBar);
+customElements.define('markazuna-search-bar', MarkazunaSearchBar);

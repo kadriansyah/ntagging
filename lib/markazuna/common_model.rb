@@ -1,4 +1,4 @@
-module MoslemCorners
+module Markazuna
     module CommonModel
         def as_json(options={})
             json = super(:except => :_id)

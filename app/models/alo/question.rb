@@ -1,8 +1,8 @@
-require 'moslemcorners/common_model'
+require 'markazuna/common_model'
 
 class Alo::Question
 	include Mongoid::Document
-    include MoslemCorners::CommonModel
+    include Markazuna::CommonModel
     store_in collection: 'questions'
 
     # kaminari page setting

@@ -10,7 +10,7 @@ import '@polymer/paper-fab/paper-fab.js';
 import '@vaadin/vaadin-grid/vaadin-grid.js';
 import '@vaadin/vaadin-grid/vaadin-grid-column.js';
 
-import './moslemcorner/moslemcorner-shared-styles.js';
+import './markazuna/markazuna-shared-styles.js';
 
 export class BaseList extends PolymerElement {
     static get template() {

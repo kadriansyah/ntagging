@@ -1,7 +1,7 @@
 import { html } from '@polymer/polymer/polymer-element.js';
 import { BaseList } from '../base-list.js'
 
-import '../moslemcorner/markazuna-circular-pager.js';
+import '../markazuna/markazuna-circular-pager.js';
 import './user-form.js';
 
 class UserList extends BaseList {

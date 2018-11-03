@@ -1,8 +1,8 @@
-require 'moslemcorners/common_model'
+require 'markazuna/common_model'
 
 class Admin::CoreUser
 	include Mongoid::Document
-    include MoslemCorners::CommonModel
+    include Markazuna::CommonModel
     store_in collection: 'core_users'
 
     # kaminari page setting

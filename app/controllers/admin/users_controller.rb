@@ -1,8 +1,7 @@
-require_dependency 'moslemcorners/di_container'
+require_dependency 'markazuna/di_container'
 
 class Admin::UsersController < ApplicationController
-    include MoslemCorners::INJECT['admin_service']
-    before_action :authenticate_core_user!
+    include Markazuna::INJECT['admin_service']
 
     # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
     wrap_parameters :core_user, include: [:id, :email, :username, :password, :confirmation_password, :firstname, :lastname]

@@ -1,8 +1,7 @@
-require_dependency 'moslemcorners/di_container'
+require_dependency 'markazuna/di_container'
 
 class Alo::TagsController < ApplicationController
-    include MoslemCorners::INJECT['tag_service']
-    before_action :authenticate_core_user!
+    include Markazuna::INJECT['tag_service']
 
     # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
     wrap_parameters :tag, include: [:id, :name, :value, :css]

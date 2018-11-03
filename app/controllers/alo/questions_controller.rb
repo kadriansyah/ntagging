@@ -1,8 +1,7 @@
-require_dependency 'moslemcorners/di_container'
+require_dependency 'markazuna/di_container'
 
 class Alo::QuestionsController < ApplicationController
-    include MoslemCorners::INJECT['question_service']
-    before_action :authenticate_core_user!
+    include Markazuna::INJECT['question_service']
 
     # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
     wrap_parameters :question, include: [:id, :title, :question_text, :question_tag, :question_label, :metadata]

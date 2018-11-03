@@ -1,4 +1,4 @@
-require_dependency 'moslemcorners/di_container'
+require_dependency 'markazuna/di_container'
 <%
     fields = ""
     for ii in 0..@fields.length-2 do
@@ -12,7 +12,7 @@ require_dependency 'moslemcorners/di_container'
     end
 %>
 class <%= generated_class_name %>Controller < ApplicationController
-    include MoslemCorners::INJECT['<%= @service_name %>']
+    include Markazuna::INJECT['<%= @service_name %>']
     before_action :authenticate_core_user!
 
     # http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html

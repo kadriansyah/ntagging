@@ -7,7 +7,7 @@ import '@polymer/iron-ajax/iron-ajax.js';
 import '@polymer/iron-input/iron-input.js';
 import '@polymer/paper-progress/paper-progress.js';
 
-import '../moslemcorner/moslemcorner-shared-styles.js';
+import '../markazuna/markazuna-shared-styles.js';
 
 class UserForm extends PolymerElement {
     static get template() {

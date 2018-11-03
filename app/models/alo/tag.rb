@@ -1,8 +1,8 @@
-require 'moslemcorners/common_model'
+require 'markazuna/common_model'
 
 class Alo::Tag
 	include Mongoid::Document
-    include MoslemCorners::CommonModel
+    include Markazuna::CommonModel
     store_in collection: 'tags'
 
     # kaminari page setting

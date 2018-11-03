@@ -1,8 +1,8 @@
 require 'dry-container'
 require 'dry-auto_inject'
-require 'moslemcorners/cache'
+require 'markazuna/cache'
 
-module MoslemCorners
+module Markazuna
     class DIContainer
         extend Dry::Container::Mixin
 
@@ -19,10 +19,10 @@ module MoslemCorners
         end
 
         register 'system_cache' do
-            MoslemCorners::Cache.instance # return singleton object
+            Markazuna::Cache.instance # return singleton object
         end
     end
 
     # dependency injection
-    INJECT = Dry::AutoInject(MoslemCorners::DIContainer)
+    INJECT = Dry::AutoInject(Markazuna::DIContainer)
 end
