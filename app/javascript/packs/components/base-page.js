@@ -194,20 +194,6 @@ export class BasePage extends PolymerElement {
         this.$.drawer.toggle();
     }
 
-    _shouldShowTabs(smallScreen) {
-        return !smallScreen;
-    }
-
-    _removeFocus(currentSelectedElementId) {
-        // remove current selected paper-item
-        if (currentSelectedElementId == 'groups' || currentSelectedElementId == 'users') {
-            this.$.contentItems.selectIndex(-1);
-        }
-        else {
-            this.$.accessItems.selectIndex(-1);
-        }
-    }
-
     _openUrl(e) {
         this.$.location.path = this.$.location.path +'/page/'+ e.target.id;
         window.location.reload(true);
